@@ -1,0 +1,10 @@
+^C:\USERS\USER\DESKTOP\KIEDY_BIEGAM\APP_KB\WINDOWS\RUNNER\CMAKELISTS.TXT
+setlocal
+"C:\Program Files\Microsoft Visual Studio\2022\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\bin\cmake.exe" -SC:/Users/User/Desktop/kiedy_biegam/app_kb/windows -BC:/Users/User/Desktop/kiedy_biegam/app_kb/build/windows/x64 --check-stamp-file C:/Users/User/Desktop/kiedy_biegam/app_kb/build/windows/x64/runner/CMakeFiles/generate.stamp
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal & call :cmErrorLevel %errorlevel% & goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd

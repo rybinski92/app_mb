@@ -1,0 +1,10 @@
+^C:\USERS\USER\DESKTOP\KIEDY_BIEGAM\APP_KB\BUILD\WINDOWS\X64\CMAKEFILES\48B1CD9FC6D94AF42DDAE4983A2F0AE5\GENERATE.STAMP.RULE
+setlocal
+"C:\Program Files\Microsoft Visual Studio\2022\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\bin\cmake.exe" -SC:/Users/User/Desktop/kiedy_biegam/app_kb/windows -BC:/Users/User/Desktop/kiedy_biegam/app_kb/build/windows/x64 --check-stamp-list CMakeFiles/generate.stamp.list --vs-solution-file C:/Users/User/Desktop/kiedy_biegam/app_kb/build/windows/x64/app_kb.sln
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal & call :cmErrorLevel %errorlevel% & goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd
