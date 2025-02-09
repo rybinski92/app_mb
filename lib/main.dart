@@ -98,7 +98,7 @@ class _HomePageState extends State<HomePage> {
         child: Column(
           children: [
             // Odstęp na górze
-            const SizedBox(height: 200),
+            const SizedBox(height: 120),
 
             // Przycisk Polecane Zawody
             Padding(
