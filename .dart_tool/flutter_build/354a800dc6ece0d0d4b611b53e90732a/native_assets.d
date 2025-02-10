@@ -1,1 +1,0 @@
- C:\\Users\\User\\Desktop\\kiedy_biegam_app2\\app_kb\\.dart_tool\\flutter_build\\354a800dc6ece0d0d4b611b53e90732a\\native_assets.yaml: 
