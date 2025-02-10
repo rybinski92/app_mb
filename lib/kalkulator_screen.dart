@@ -119,16 +119,18 @@ class _KalkulatorScreenState extends State<KalkulatorScreen> {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         const Text("Tempo biegu",
-            style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold)),
-        const SizedBox(height: 10),
+            style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold,  height: 2)),
+        const Text("Wybierz dystans",
+            style: TextStyle(fontSize: 15, fontWeight: FontWeight.bold)),
+        const SizedBox(height: 2),
         _poleWybieraniaDystansu(),
-        const SizedBox(height: 10),
+        const SizedBox(height: 8),
         _poleWprowadzaniaDystansu(),
-        const SizedBox(height: 10),
+        const SizedBox(height: 8),
         _poleCzasu(),
-        const SizedBox(height: 10),
+        const SizedBox(height: 14),
         _przyciskOblicz(_obliczTempo),
-        const SizedBox(height: 20),
+        const SizedBox(height: 14),
         _wynik("Tempo biegu: $_wynikTempo"),
       ],
     );
@@ -141,15 +143,15 @@ class _KalkulatorScreenState extends State<KalkulatorScreen> {
       children: [
         const Text("Czas odcinka",
             style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold)),
-        const SizedBox(height: 10),
+        const SizedBox(height: 2),
         _poleWprowadzania("Planowane tempo biegu:", _tempoMinController, "min",
             _tempoSecController, "s"),
-        const SizedBox(height: 10),
+        const SizedBox(height: 8),
         _poleWprowadzania(
             "Dystans:", _odcinekKmController, "km", _odcinekMController, "m"),
-        const SizedBox(height: 10),
+        const SizedBox(height: 14),
         _przyciskOblicz(_obliczCzasOdcinka),
-        const SizedBox(height: 20),
+        const SizedBox(height: 14),
         _wynik("Czas odcinka: $_wynikCzasOdcinka"),
       ],
     );
@@ -176,7 +178,7 @@ class _KalkulatorScreenState extends State<KalkulatorScreen> {
 
   Widget _poleWprowadzaniaDystansu() {
     return _poleWprowadzania(
-        "Lub wprowadź dystans:", _kmController, "km", _mController, "m");
+        "lub wprowadź dystans:", _kmController, "km", _mController, "m");
   }
 
   Widget _poleCzasu() {
@@ -192,13 +194,13 @@ class _KalkulatorScreenState extends State<KalkulatorScreen> {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(label,
-            style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+            style: const TextStyle(fontSize: 15, fontWeight: FontWeight.bold)),
         Row(children: [
           _input(ctrl1, lbl1),
-          const SizedBox(width: 10),
+          const SizedBox(width: 8),
           _input(ctrl2, lbl2),
           if (dodatkowePole != null) ...[
-            const SizedBox(width: 10),
+            const SizedBox(width: 8),
             _input(dodatkowePole, dodatkowyLabel!),
           ]
         ]),
