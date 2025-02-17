@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
-import 'package:excel/excel.dart';
-import 'dart:typed_data';
+// import 'package:excel/excel.dart';
+// import 'dart:typed_data';
 import 'package:url_launcher/url_launcher.dart';
+import 'package:http/http.dart' as http;
+import 'dart:convert';
 
 class ZawodyScreen extends StatefulWidget {
-  final Uint8List excelBytes;
-
-  const ZawodyScreen({required this.excelBytes, super.key});
+  const ZawodyScreen({super.key});
 
   @override
   _ZawodyScreenState createState() => _ZawodyScreenState();
@@ -20,6 +20,9 @@ class _ZawodyScreenState extends State<ZawodyScreen> {
   String wybranyMiesiac = "Cały rok";
   String wybranyRok = "2025";
   String? wybranyTypZawodow = "Wszystkie zawody"; // Dodany filtr na typ zawodów
+
+  final String apiUrl = "https://api.appsheet.com/api/v2/apps/566e1354-d7f1-49a1-bb85-6ce2f26ce8b4/tables/zawody/records";
+  final String apiKey = "V2-F5h9i-H4xyN-PNNOf-rmtPX-lwZLk-W1tb3-H8B48-oBMzN";
 
   final Map<String, int> miesiaceKolejnosc = {
     "styczeń": 1,
@@ -39,103 +42,149 @@ class _ZawodyScreenState extends State<ZawodyScreen> {
   @override
   void initState() {
     super.initState();
-    _odczytajExcel(widget.excelBytes);
+    _pobierzDaneZAppSheet();
   }
 
-  void _odczytajExcel(Uint8List bytes) {
-    final excel = Excel.decodeBytes(bytes);
-    final zawodySheet = excel.tables[excel.tables.keys.first];
+  /// 📡 Pobiera dane z AppSheet API
+  Future<void> _pobierzDaneZAppSheet() async {
+    try {
+      final url = Uri.parse(apiUrl);
+      final response = await http.post(
+        url,
+        headers: {
+          "Accept": "application/json",
+          "Content-Type": "application/json; charset=utf-8",
+          "ApplicationAccessKey": apiKey,
+        },
+        body: jsonEncode({
+          "Action": "Find",
+          "Properties": { "Locale": "pl-PL" },
+          "Rows": []
+        }),
+      );
 
-    if (zawodySheet == null) return;
+      // print("📩 Odpowiedź status code: ${response.statusCode}");
+      // print("📩 Odpowiedź headers: ${response.headers}");
+      // print("📩 Odpowiedź body: '${response.body}'");
 
-    final wojewodztwaSet = <String>{"Wszystkie województwa"};
-    final miesiaceSet = <String>{"Cały rok"};
+      if (response.statusCode == 200) {
+        if (response.body.trim().isEmpty) {
+          print("⚠ API zwróciło pustą odpowiedź!");
+          return;
+        }
 
-    for (var row in zawodySheet.rows.skip(1)) {
-      final nazwa = row[0]?.value.toString() ?? '';
-      final dataPrzetworzona = row[1]?.value.toString().split('T').first ?? '';
-      final miesiac = row[2]?.value.toString().trim() ?? '';
-      final rok = row[3]?.value.toString() ?? '';
-      final miejsce = row[5]?.value.toString() ?? '';
-      final wojewodztwo = row[6]?.value.toString() ?? '';
-      final dystanse = row[4]?.value.toString() ?? '';
-      final gorskie = row[7]?.value.toString().trim() ?? '0';
+      final decodedBody = utf8.decode(response.bodyBytes);
+      final List<dynamic> data = json.decode(decodedBody);
 
-      if (nazwa.isNotEmpty &&
-          dataPrzetworzona.isNotEmpty &&
-          miesiac.isNotEmpty &&
-          miejsce.isNotEmpty &&
-          wojewodztwo.isNotEmpty &&
-          rok.isNotEmpty) {
-        zawody.add({
-          "nazwa": nazwa,
-          "dataPrzetworzona": dataPrzetworzona,
-          "miesiac": miesiac,
-          "rok": rok,
-          "miejsce": miejsce,
-          "wojewodztwo": wojewodztwo,
-          "dystanse": dystanse,
-          "gorskie": gorskie,
+        final wojewodztwaSet = <String>{"Wszystkie województwa"};
+        final miesiaceSet = <String>{"Cały rok"};
+
+        setState(() {
+          zawody = data.map((zawod) {
+            final nazwa = zawod["nazwa"] ?? zawod["Nazwa"] ?? "";
+            final rawDate = zawod["data"] ?? zawod["Data"] ?? "";
+            final miesiac = zawod["miesiac"] ?? zawod["Miesiac"] ?? "";
+            final rok = zawod["rok"] ?? zawod["Rok"] ?? "";
+            final miejsce = zawod["miejsce"] ?? zawod["Miejsce"] ?? "";
+            final wojewodztwo = zawod["wojewodztwo"] ?? zawod["Wojewodztwo"] ?? "";
+            final dystanse = zawod["dystans"] ?? zawod["Dystans"] ?? "";
+            final gorskie = zawod["gorskie"] ?? zawod["Gorskie"] ?? "0";
+
+            wojewodztwaSet.add(wojewodztwo);
+            miesiaceSet.add(miesiac);
+
+            return {
+              "nazwa": nazwa.toString(),
+              "dataPrzetworzona": _formatDate(rawDate),
+              "miesiac": miesiac.toString(),
+              "rok": rok.toString(),
+              "miejsce": miejsce.toString(),
+              "wojewodztwo": wojewodztwo.toString(),
+              "dystanse": dystanse.toString(),
+              "gorskie": gorskie.toString(),
+            };
+          }).toList();
+
+          final List<String> poprawnaKolejnoscWojewodztw = [
+            "DOLNOŚLĄSKIE",  
+            "KUJAWSKO-POMORSKIE" , 
+            "LUBELSKIE",  
+            "LUBUSKIE",  
+            "ŁÓDZKIE" , 
+            "MAŁOPOLSKIE" , 
+            "MAZOWIECKIE",  
+            "OPOLSKIE"  ,
+            "PODKARPACKIE" , 
+            "PODLASKIE"  ,
+            "POMORSKIE" , 
+            "ŚLĄSKIE" , 
+            "ŚWIĘTOKRZYSKIE" , 
+            "WARMIŃSKO-MAZURSKIE" ,
+            "WIELKOPOLSKIE" , 
+            "ZACHODNIOPOMORSKIE"
+          ];
+
+          setState(() {
+            // Sortowanie miesięcy wg poprawnej kolejności
+            miesiace = miesiaceSet.toList();
+            miesiace.sort((a, b) => (miesiaceKolejnosc[a] ?? 99).compareTo(miesiaceKolejnosc[b] ?? 99));
+
+            // Pobranie listy województw
+            wojewodztwa = wojewodztwaSet.toList();
+            
+            // Usunięcie "Wszystkie województwa" przed sortowaniem
+            wojewodztwa.remove("Wszystkie województwa");
+
+            // Sortowanie wg poprawnej kolejności
+            wojewodztwa.sort((a, b) {
+              final indexA = poprawnaKolejnoscWojewodztw.indexOf(a);
+              final indexB = poprawnaKolejnoscWojewodztw.indexOf(b);
+
+              if (indexA == -1) return 1; // Jeśli województwo nie jest w liście, daj na koniec
+              if (indexB == -1) return -1;
+              return indexA.compareTo(indexB);
+            });
+
+            // Dodanie "Wszystkie województwa" na początek listy
+            wojewodztwa.insert(0, "Wszystkie województwa");
+          });
         });
-        wojewodztwaSet.add(wojewodztwo);
-        miesiaceSet.add(miesiac);
+
+        print("✅ Pobrano ${zawody.length} zawodów!");
+      } else {
+        print("❌ Błąd pobierania danych: ${response.statusCode} - ${response.body}");
       }
+    } catch (e) {
+      print("❌ Błąd połączenia: $e");
     }
+  }
 
-    final List<String> poprawnaKolejnoscWojewodztw = [
-      "DOLNOŚLĄSKIE",  
-      "KUJAWSKO-POMORSKIE" , 
-      "LUBELSKIE",  
-      "LUBUSKIE",  
-      "ŁÓDZKIE" , 
-      "MAŁOPOLSKIE" , 
-      "MAZOWIECKIE",  
-      "OPOLSKIE"  ,
-      "PODKARPACKIE" , 
-      "PODLASKIE"  ,
-      "POMORSKIE" , 
-      "ŚLĄSKIE" , 
-      "ŚWIĘTOKRZYSKIE" , 
-      "WARMIŃSKO-MAZURSKIE" ,
-      "WIELKOPOLSKIE" , 
-      "ZACHODNIOPOMORSKIE"
-    ];
-
-    setState(() {
-
-      miesiace = miesiaceSet.toList();
-      miesiace.sort((a, b) => (miesiaceKolejnosc[a] ?? 99).compareTo(miesiaceKolejnosc[b] ?? 99));
-      
-      wojewodztwa = wojewodztwaSet.toList();
-      wojewodztwa.remove("Wszystkie województwa");
-
-      wojewodztwa.sort((a, b) {
-        final indexA = poprawnaKolejnoscWojewodztw.indexOf(a);
-        final indexB = poprawnaKolejnoscWojewodztw.indexOf(b);
-
-        if (indexA == -1) return 1; // Jeśli brak w liście, daj na koniec
-        if (indexB == -1) return -1;
-        return indexA.compareTo(indexB);
-      });
-
-      wojewodztwa.insert(0, "Wszystkie województwa"); // Dodaj na początek
-    });
+  /// ✅ Formatuje datę z MM/DD/YYYY na DD-MM-YYYY
+  String _formatDate(String rawDate) {
+    try {
+      final dateParts = rawDate.split('/');
+      if (dateParts.length == 3) {
+        final month = int.parse(dateParts[0]);
+        final day = int.parse(dateParts[1]);
+        final year = int.parse(dateParts[2]);
+        return "${day.toString().padLeft(2, '0')}-${month.toString().padLeft(2, '0')}-${year}";
+      }
+    } catch (e) {
+      print("❌ Błąd parsowania daty: $rawDate");
+    }
+    return rawDate;
   }
 
   List<Map<String, String>> _filtrujZawody() {
-    return zawody.where((zawod) {
+    return zawody.where((z) {
       final wojFilter = wybraneWojewodztwo == null ||
           wybraneWojewodztwo == "Wszystkie województwa" ||
-          wybraneWojewodztwo == zawod["wojewodztwo"];
+          wybraneWojewodztwo == z["wojewodztwo"];
 
-      final miesiacFilter =
-          wybranyMiesiac == "Cały rok" || wybranyMiesiac == zawod["miesiac"];
-
-      final rokFilter = wybranyRok == zawod["rok"];
-
-      // Filtracja według typu zawodów: Górskie zawody
+      final miesiacFilter = wybranyMiesiac == "Cały rok" || wybranyMiesiac == z["miesiac"];
+      final rokFilter = wybranyRok == z["rok"];
       final gorskieFilter = wybranyTypZawodow == "Wszystkie zawody" ||
-          (wybranyTypZawodow == "Górskie zawody" && zawod["gorskie"] == "1");
+          (wybranyTypZawodow == "Górskie zawody" && z["gorskie"] == "1");
 
       return wojFilter && miesiacFilter && rokFilter && gorskieFilter;
     }).toList();
