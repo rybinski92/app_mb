@@ -30,12 +30,12 @@ class PartnerzyScreen extends StatelessWidget {
             child: Column(
               children: [
                 // Lista partnerów
-                _buildPartnerCard(
-                  "Sportiva",
-                  "zdjecia/partnerzy/sportiva.jpg",
-                  "https://www.sportiva.pl/",
-                ),
-                const SizedBox(height: 20),
+                // _buildPartnerCard(
+                //   "Sportiva",
+                //   "zdjecia/partnerzy/sportiva.jpg",
+                //   "https://www.sportiva.pl/",
+                // ),
+                // const SizedBox(height: 20),
                 _buildPartnerCard(
                   "Zen.com Expo",
                   "zdjecia/partnerzy/zen_com.jpg",
