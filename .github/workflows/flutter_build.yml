@@ -1,0 +1,41 @@
+name: Flutter Build
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Setup Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          flutter-version: '3.13.0' # lub najnowsza wersja
+
+      - name: Install dependencies
+        run: flutter pub get
+
+      - name: Set up environment variables
+        run: |
+          echo "APPSHEET_API_KEY_1=${{ secrets.APPSHEET_API_KEY_1 }}" >> .env
+          echo "APPSHEET_API_KEY_2=${{ secrets.APPSHEET_API_KEY_2 }}" >> .env
+          echo "APPSHEET_API_KEY_3=${{ secrets.APPSHEET_API_KEY_3 }}" >> .env
+          echo "APPSHEET_API_KEY_4=${{ secrets.APPSHEET_API_KEY_4 }}" >> .env
+
+      - name: Build APK
+        run: flutter build apk --release
+
+      - name: Upload APK Artifact
+        uses: actions/upload-artifact@v3
+        with:
+          name: release-apk
+          path: build/app/outputs/flutter-apk/app-release.apk
