@@ -188,17 +188,17 @@ String _handlePolishCharacters(String text) {
         ),
         child: Column(
           children: [
-            const SizedBox(height: 120),
+            const SizedBox(height: 90),
 
             // Przycisk Polecane Zawody
             Padding(
-              padding: const EdgeInsets.only(bottom: 10.0),
+              padding: const EdgeInsets.only(bottom: 8.0),
               child: ElevatedButton(
                 style: ElevatedButton.styleFrom(
                   backgroundColor: Colors.white,
                   foregroundColor: Colors.orange,
                   shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-                  padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
                 ),
                 onPressed: () {
                   Navigator.push(
@@ -256,12 +256,12 @@ String _handlePolishCharacters(String text) {
                       _buildButton(context, "Partnerzy", () {
                         Navigator.push(context, MaterialPageRoute(builder: (context) => const PartnerzyScreen()));
                       }),
-                      const SizedBox(width: 15),
+                      const SizedBox(width: 13),
                       _buildButton(context, "Kalkulator 🏃", () {
                         Navigator.push(context, MaterialPageRoute(builder: (context) => const KalkulatorScreen()));
                       }),
-                      const SizedBox(width: 15),
-                      _buildButton(context, "ℹ", () {
+                      const SizedBox(width: 11),
+                      _buildButton(context, "ℹ📯", () {
                         Navigator.push(context, MaterialPageRoute(builder: (context) => const OApkScreen()));
                       }),
                     ],

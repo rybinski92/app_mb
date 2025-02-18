@@ -17,24 +17,26 @@ class _DodajZawodyScreenState extends State<DodajZawodyScreen> {
   final _miejscowoscController = TextEditingController();
 
   final List<String> wojewodztwa = [
-    "Dolnośląskie",
-    "Kujawsko-Pomorskie",
-    "Lubelskie",
-    "Lubuskie",
-    "Małopolskie",
-    "Mazowieckie",
-    "Opolskie",
-    "Podkarpackie",
-    "Podlaskie",
-    "Pomorskie",
-    "Śląskie",
-    "Świętokrzyskie",
-    "Warmińsko-Mazurskie",
-    "Wielkopolskie",
-    "Zachodniopomorskie"
+    "DOLNOŚLĄSKIE",
+    "KUJAWSKO-POMORSKIE",
+    "LUBELSKIE",
+    "LUBUSKIE",
+    "ŁÓDZKIE",
+    "MAŁOPOLSKIE",
+    "MAZOWIECKIE",
+    "OPOLSKIE",
+    "PODKARPACKIE",
+    "PODLASKIE",
+    "POMORSKIE",
+    "ŚLĄSKIE",
+    "ŚWIĘTOKRZYSKIE",
+    "WARMIŃSKO-MAZURSKIE",
+    "WIELKOPOLSKIE",
+    "ZACHODNIOPOMORSKIE"
   ];
 
   String? _selectedWojewodztwo;
+  bool _isGorskiePunktowane = false; // Nowa zmienna
 
   @override
   Widget build(BuildContext context) {
@@ -62,6 +64,8 @@ class _DodajZawodyScreenState extends State<DodajZawodyScreen> {
                   _poleTekstowe(_miejscowoscController, 'Miejscowość'),
                   const SizedBox(height: 20),
                   _poleDropdown(),
+                  const SizedBox(height: 20),
+                  _poleGorskiePunktowane(), // Dodajemy nowe pole
                   const SizedBox(height: 30),
                   _przyciskZapisz(),
                 ],
@@ -128,6 +132,24 @@ class _DodajZawodyScreenState extends State<DodajZawodyScreen> {
     );
   }
 
+  // Pole "Czy zawody górskie punktowane w RMT"
+  Widget _poleGorskiePunktowane() {
+    return Row(
+      children: [
+        const Text('Czy zawody górskie punktowane w RMT?'),
+        Switch(
+          value: _isGorskiePunktowane,
+          onChanged: (value) {
+            setState(() {
+              _isGorskiePunktowane = value;
+            });
+          },
+        ),
+        Text(_isGorskiePunktowane ? 'Tak' : 'Nie'),
+      ],
+    );
+  }
+
   // Przycisk "Zapisz"
   Widget _przyciskZapisz() {
     return ElevatedButton(
@@ -162,9 +184,9 @@ class _DodajZawodyScreenState extends State<DodajZawodyScreen> {
   // Wysyłanie danych do AppSheet
   Future<void> _sendToAppSheet() async {
     const String apiUrl =
-        "https://api.appsheet.com/api/v2/apps/0e6e9e7d-d4f2-42a1-a631-d962f2aae09e/tables/Arkusz1/Add";
+        "https://api.appsheet.com/api/v2/apps/57025f21-4219-4291-ba75-6745b608e965/tables/Arkusz1/Add";
 
-    const String applicationAccessKey = "V2-Us69h-0IidB-WN9C0-Uhitj-CZgM8-rwMpD-DL6d1-EQYrE"; // <-- Wstaw swój klucz API
+    const String applicationAccessKey = "V2-WuGVt-d2uuu-w7xds-l31vv-pU3hO-DNrxG-QB78D-WLD4g"; // <-- Wstaw swój klucz API
 
     if (_nazwaController.text.isEmpty ||
         _selectedDate == null ||
@@ -185,6 +207,7 @@ class _DodajZawodyScreenState extends State<DodajZawodyScreen> {
           "dystans": _dystansController.text,
           "miejsce": _miejscowoscController.text,
           "wojewodztwo": _selectedWojewodztwo!,
+          "czy_gorskie": _isGorskiePunktowane ? "1" : "0", // Dodajemy nową kolumnę
         }
       ]
     };
