@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'dart:convert';
 import 'package:http/http.dart' as http;
+import 'config.dart';
 
 class DodajZawodyScreen extends StatefulWidget {
   const DodajZawodyScreen({Key? key}) : super(key: key);
@@ -186,7 +187,7 @@ class _DodajZawodyScreenState extends State<DodajZawodyScreen> {
     const String apiUrl =
         "https://api.appsheet.com/api/v2/apps/57025f21-4219-4291-ba75-6745b608e965/tables/Arkusz1/Add";
 
-    const String applicationAccessKey = "V2-WuGVt-d2uuu-w7xds-l31vv-pU3hO-DNrxG-QB78D-WLD4g"; // <-- Wstaw swój klucz API
+    const String applicationAccessKey = Config.apiKey1;  // <-- Wstaw swój klucz API
 
     if (_nazwaController.text.isEmpty ||
         _selectedDate == null ||

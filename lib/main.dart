@@ -8,9 +8,10 @@ import 'package:app_kb/recommended_zawody.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
-// import 'dart:typed_data';
+import 'config.dart';
 
-void main() {
+
+void main()  {
   runApp(const MyApp());
 }
 
@@ -42,7 +43,8 @@ class _HomePageState extends State<HomePage> {
 
   // URL AppSheet API (Zmień na swój)
   final String apiUrl = "https://api.appsheet.com/api/v2/apps/5408db07-71e1-4309-a30a-dc9c7c1ae7a3/tables/Arkusz1/records";
-  final String apiKey = "V2-ntiId-0dGpB-P6FJ7-85gTl-dH3t4-0yYCV-daevp-gBs1Q";
+
+
 
   @override
   void initState() {
@@ -53,13 +55,14 @@ class _HomePageState extends State<HomePage> {
   Future<void> _fetchPolecaneZawody() async {
   try {
     final url = Uri.parse("https://api.appsheet.com/api/v2/apps/5408db07-71e1-4309-a30a-dc9c7c1ae7a3/tables/Arkusz1/records");
-    
+    final String apiKey2 = Config.apiKey2;
+
     final response = await http.post(
       url,
       headers: {
         "Accept": "application/json",
         "Content-Type": "application/json; charset=utf-8",
-        "ApplicationAccessKey": "V2-ZLb8Y-JzyV1-eUXjV-46Nbq-oFpXU-jr8IP-Eozsk-7aEOK"
+        "ApplicationAccessKey": apiKey2,
       },
       body: jsonEncode({    "Action": "Find", // AppSheet wymaga tej akcji do pobierania danych
     "Properties": {

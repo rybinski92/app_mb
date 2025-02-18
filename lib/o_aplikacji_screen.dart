@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:url_launcher/url_launcher.dart';
+import 'config.dart';
 
 class OApkScreen extends StatefulWidget {
   const OApkScreen({super.key});
@@ -14,7 +15,7 @@ class _OApkScreenState extends State<OApkScreen> {
   final TextEditingController _controller = TextEditingController();
   final String apiUrl =
       "https://api.appsheet.com/api/v2/apps/3b42e9e3-47fd-4cf0-8ee4-aefaab5b9795/tables/Arkusz1/Add";
-  final String apiKey = "V2-badec-FfQpV-P3ZJv-kS09f-HKwx0-HTPfn-XQqor-RSYq6";
+  final String apiKey = Config.apiKey4;
 
   // Funkcja do wysyłania wiadomości do AppSheet
 // Funkcja do wysyłania wiadomości do AppSheet
