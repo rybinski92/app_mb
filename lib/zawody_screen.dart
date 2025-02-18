@@ -1,9 +1,8 @@
 import 'package:flutter/material.dart';
-// import 'package:excel/excel.dart';
-// import 'dart:typed_data';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
+import 'config.dart';
 
 class ZawodyScreen extends StatefulWidget {
   const ZawodyScreen({super.key});
@@ -22,7 +21,7 @@ class _ZawodyScreenState extends State<ZawodyScreen> {
   String? wybranyTypZawodow = "Wszystkie zawody"; // Dodany filtr na typ zawodów
 
   final String apiUrl = "https://api.appsheet.com/api/v2/apps/566e1354-d7f1-49a1-bb85-6ce2f26ce8b4/tables/zawody/records";
-  final String apiKey = "V2-F5h9i-H4xyN-PNNOf-rmtPX-lwZLk-W1tb3-H8B48-oBMzN";
+  final String apiKey = Config.apiKey3;
 
   final Map<String, int> miesiaceKolejnosc = {
     "styczeń": 1,

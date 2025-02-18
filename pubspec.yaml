@@ -40,6 +40,7 @@ dependencies:
   webview_flutter: ^4.0.0
   http: ^0.13.5
   csv: ^5.1.1
+  flutter_dotenv: ^5.1.0
 
   # The following adds the Cupertino Icons font to your application.
   # Use with the CupertinoIcons class for iOS style icons.
@@ -80,6 +81,7 @@ flutter:
     - zdjecia/partnerzy/zen_com.jpg
     # - pliki_bazy/dodane_zawody.xlsx
     - pliki_bazy/polecane.xlsx
+    # - assets/config.json
 
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/to/resolution-aware-images
