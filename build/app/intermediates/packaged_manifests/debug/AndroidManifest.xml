@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="com.example.app_kb"
-    android:versionCode="1"
+    package="com.a10i.app_kb"
+    android:versionCode="2"
     android:versionName="1.0.0" >
 
     <uses-sdk
@@ -29,10 +29,10 @@
     </queries>
 
     <permission
-        android:name="com.example.app_kb.DYNAMIC_RECEIVER_NOT_EXPORTED_PERMISSION"
+        android:name="com.a10i.app_kb.DYNAMIC_RECEIVER_NOT_EXPORTED_PERMISSION"
         android:protectionLevel="signature" />
 
-    <uses-permission android:name="com.example.app_kb.DYNAMIC_RECEIVER_NOT_EXPORTED_PERMISSION" />
+    <uses-permission android:name="com.a10i.app_kb.DYNAMIC_RECEIVER_NOT_EXPORTED_PERMISSION" />
 
     <application
         android:name="android.app.Application"
@@ -42,7 +42,7 @@
         android:icon="@mipmap/ic_launcher"
         android:label="Mój bieg" >
         <activity
-            android:name="com.example.app_kb.MainActivity"
+            android:name="com.a10i.app_kb.MainActivity"
             android:configChanges="orientation|keyboardHidden|keyboard|screenSize|smallestScreenSize|locale|layoutDirection|fontScale|screenLayout|density|uiMode"
             android:exported="true"
             android:hardwareAccelerated="true"
@@ -89,7 +89,7 @@
 
         <provider
             android:name="androidx.startup.InitializationProvider"
-            android:authorities="com.example.app_kb.androidx-startup"
+            android:authorities="com.a10i.app_kb.androidx-startup"
             android:exported="false" >
             <meta-data
                 android:name="androidx.lifecycle.ProcessLifecycleInitializer"

@@ -1,7 +1,7 @@
 {
     "logs": [
         {
-            "outputFile": "com.example.app_kb.app-mergeDebugResources-26:/values/values.xml",
+            "outputFile": "com.a10i.app_kb.app-mergeDebugResources-26:/values/values.xml",
             "map": [
                 {
                     "source": "C:\\Users\\User\\.gradle\\caches\\transforms-3\\469f715edc66045675cc1afb54e8ab0e\\transformed\\jetified-window-1.2.0\\res\\values\\values.xml",
