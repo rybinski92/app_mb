@@ -5,8 +5,28 @@ plugins {
     id "dev.flutter.flutter-gradle-plugin"
 }
 
+def secretsProperties = new Properties()
+def secretsFile = rootProject.file("../local.properties") // WAŻNE! Zmień plik
+if (secretsFile.exists()) {
+    secretsFile.withReader("UTF-8") { reader -> secretsProperties.load(reader) }
+    // Sprawdź, czy plik i wartości są poprawnie wczytywane
+    println("API Key 1: " + secretsProperties['apiKey1'])
+    println("API Key 2: " + secretsProperties['apiKey2'])
+    println("API Key 3: " + secretsProperties['apiKey3'])
+    println("API Key 4: " + secretsProperties['apiKey4'])
+} else {
+    println("Plik local.properties nie istnieje!")
+}
+
+
+def keystoreProperties = new Properties()
+def keystorePropertiesFile = rootProject.file("key.properties")
+if (keystorePropertiesFile.exists()) {
+    keystoreProperties.load(new FileInputStream(keystorePropertiesFile))
+}
+
 android {
-    namespace = "com.example.app_kb"
+    namespace = "com.a10i.app_kb"
     compileSdk = flutter.compileSdkVersion
     ndkVersion = flutter.ndkVersion
 
@@ -20,25 +40,41 @@ android {
     }
 
     defaultConfig {
-        // TODO: Specify your own unique Application ID (https://developer.android.com/studio/build/application-id.html).
-        applicationId = "com.example.app_kb"
-        // You can update the following values to match your application needs.
-        // For more information, see: https://flutter.dev/to/review-gradle-config.
+        applicationId = "com.a10i.app_kb"
         minSdk = flutter.minSdkVersion
         targetSdk = flutter.targetSdkVersion
         versionCode = flutter.versionCode
         versionName = flutter.versionName
     }
 
-    buildTypes {
+    // ✨ DODAJ TEN FRAGMENT
+    buildFeatures {
+        buildConfig = true
+    }
+
+    signingConfigs {
         release {
-            // TODO: Add your own signing config for the release build.
-            // Signing with the debug keys for now, so `flutter run --release` works.
-            signingConfig = signingConfigs.debug
+            storeFile file(keystoreProperties['storeFile'])
+            storePassword keystoreProperties['storePassword']
+            keyAlias keystoreProperties['keyAlias']
+            keyPassword keystoreProperties['keyPassword']
         }
     }
-}
 
-flutter {
-    source = "../.."
+    buildTypes {
+        debug {
+            buildConfigField "String", "API_KEY1", secretsProperties['apiKey1'] != null ? "\"${secretsProperties['apiKey1']}\"" : "\"\""
+            buildConfigField "String", "API_KEY2", secretsProperties['apiKey2'] != null ? "\"${secretsProperties['apiKey2']}\"" : "\"\""
+            buildConfigField "String", "API_KEY3", secretsProperties['apiKey3'] != null ? "\"${secretsProperties['apiKey3']}\"" : "\"\""
+            buildConfigField "String", "API_KEY4", secretsProperties['apiKey4'] != null ? "\"${secretsProperties['apiKey4']}\"" : "\"\""
+        }
+        release {
+            signingConfig = signingConfigs.debug
+            signingConfig signingConfigs.release
+            buildConfigField "String", "API_KEY1", "\"${secretsProperties.getProperty('apiKey1', '')}\""
+            buildConfigField "String", "API_KEY2", "\"${secretsProperties.getProperty('apiKey2', '')}\""
+            buildConfigField "String", "API_KEY3", "\"${secretsProperties.getProperty('apiKey3', '')}\""
+            buildConfigField "String", "API_KEY4", "\"${secretsProperties.getProperty('apiKey4', '')}\""
+        }
+    }
 }

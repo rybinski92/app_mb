@@ -1,1 +1,3 @@
-# lib/config.dart
+lib/config.dart
+android/gradle.properties
+local.properties
