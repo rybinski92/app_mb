@@ -39996,35 +39996,36 @@ A.RI.prototype={
 ar(){this.aI()
 this.wD()},
 wD(){return this.a5J()},
-a5J(){var s=0,r=A.O(t.H),q,p=2,o,n=this,m,l,k,j,i,h,g,f,e,d
-var $async$wD=A.P(function(a,b){if(a===1){o=b
-s=p}while(true)switch(s){case 0:e={}
+a5J(){var s=0,r=A.O(t.H),q,p=2,o,n=this,m,l,k,j,i,h,g,f,e,d,c
+var $async$wD=A.P(function(a,a0){if(a===1){o=a0
+s=p}while(true)switch(s){case 0:d={}
 p=4
 m=A.ek("https://api.appsheet.com/api/v2/apps/5408db07-71e1-4309-a30a-dc9c7c1ae7a3/tables/Arkusz1/records",0,null)
-h=t.N
-g=A.ai(["Accept","application/json","Content-Type","application/json; charset=utf-8","ApplicationAccessKey","V2-ZLb8Y-JzyV1-eUXjV-46Nbq-oFpXU-jr8IP-Eozsk-7aEOK"],h,h)
+l="V2-ZLb8Y-JzyV1-eUXjV-46Nbq-oFpXU-jr8IP-Eozsk-7aEOK"
+g=t.N
+f=A.ai(["Accept","application/json","Content-Type","application/json; charset=utf-8","ApplicationAccessKey",l],g,g)
 s=7
-return A.S(A.asc(m,B.bi.ud(A.ai(["Action","Find","Properties",A.ai(["Locale","pl-PL"],h,h),"Rows",[]],h,t.K),null),g),$async$wD)
-case 7:l=b
-if(l.b===200){h=l
-if(A.Yh(A.Y6(h.e).c.a.h(0,"charset")).dz(0,h.w).length===0){A.dT("\u26a0 API zwr\xf3ci\u0142o pust\u0105 odpowied\u017a!")
+return A.S(A.asc(m,B.bi.ud(A.ai(["Action","Find","Properties",A.ai(["Locale","pl-PL"],g,g),"Rows",[]],g,t.K),null),f),$async$wD)
+case 7:k=a0
+if(k.b===200){g=k
+if(A.Yh(A.Y6(g.e).c.a.h(0,"charset")).dz(0,g.w).length===0){A.dT("\u26a0 API zwr\xf3ci\u0142o pust\u0105 odpowied\u017a!")
 s=1
-break}k=B.a0.dz(0,l.w)
-e.a=null
-try{h=e.a=B.bi.dz(0,k)}catch(c){j=A.ao(c)
-A.dT("\u274c B\u0142\u0105d dekodowania JSON: "+A.k(j))
+break}j=B.a0.dz(0,k.w)
+d.a=null
+try{g=d.a=B.bi.dz(0,j)}catch(b){i=A.ao(b)
+A.dT("\u274c B\u0142\u0105d dekodowania JSON: "+A.k(i))
 s=1
-break}if(J.hu(h)){A.dT("\u26a0 API zwr\xf3ci\u0142o pust\u0105 list\u0119 zawod\xf3w!")
+break}if(J.hu(g)){A.dT("\u26a0 API zwr\xf3ci\u0142o pust\u0105 list\u0119 zawod\xf3w!")
 s=1
-break}n.a5(new A.akV(e,n))
-A.dT("\u2705 Pobrano "+n.d.length+" zawod\xf3w!")}else{e=l
-A.dT("\u274c B\u0142\u0105d pobierania danych: "+l.b+" - "+A.Yh(A.Y6(e.e).c.a.h(0,"charset")).dz(0,e.w))}p=2
+break}n.a5(new A.akV(d,n))
+A.dT("\u2705 Pobrano "+n.d.length+" zawod\xf3w!")}else{d=k
+A.dT("\u274c B\u0142\u0105d pobierania danych: "+k.b+" - "+A.Yh(A.Y6(d.e).c.a.h(0,"charset")).dz(0,d.w))}p=2
 s=6
 break
 case 4:p=3
-d=o
-i=A.ao(d)
-A.dT("\u274c B\u0142\u0105d po\u0142\u0105czenia: "+A.k(i))
+c=o
+h=A.ao(c)
+A.dT("\u274c B\u0142\u0105d po\u0142\u0105czenia: "+A.k(h))
 s=6
 break
 case 3:s=2
