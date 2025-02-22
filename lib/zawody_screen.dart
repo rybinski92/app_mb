@@ -20,6 +20,8 @@ class _ZawodyScreenState extends State<ZawodyScreen> {
   String wybranyRok = "2025";
   String? wybranyTypZawodow = "Wszystkie zawody"; // Dodany filtr na typ zawodów
 
+  bool _pokazFiltry = true; // <-- Nowa zmienna do sterowania widocznością filtrów
+
   final String apiUrl = "https://api.appsheet.com/api/v2/apps/566e1354-d7f1-49a1-bb85-6ce2f26ce8b4/tables/zawody/records";
   final String apiKey = Config.apiKey3;
   
@@ -210,8 +212,19 @@ class _ZawodyScreenState extends State<ZawodyScreen> {
       appBar: AppBar(
         title: Row(
           children: [
-            const Text("Zawody biegowe"),
-            const SizedBox(width: 5),
+            const Text("Zawody | Filtry"),
+            const SizedBox(width: 10),
+            Switch(
+              value: _pokazFiltry,
+              onChanged: (value) {
+                setState(() {
+                  _pokazFiltry = value;
+                });
+              },
+              activeColor: Colors.white,
+              activeTrackColor: Colors.green,
+              inactiveTrackColor: Colors.grey,
+            ),
           ],
         ),
         backgroundColor: Colors.orange,
@@ -223,6 +236,7 @@ class _ZawodyScreenState extends State<ZawodyScreen> {
           ),
           child: Column(
             children: [
+              if (_pokazFiltry) // Pokazujemy filtry tylko, jeśli _pokazFiltry == true
               Padding(
                 padding: const EdgeInsets.all(8.0),
                 child: Column(
