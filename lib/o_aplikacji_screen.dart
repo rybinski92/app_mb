@@ -15,7 +15,7 @@ class _OApkScreenState extends State<OApkScreen> {
   final TextEditingController _controller = TextEditingController();
   final String apiUrl =
       "https://api.appsheet.com/api/v2/apps/3b42e9e3-47fd-4cf0-8ee4-aefaab5b9795/tables/Arkusz1/Add";
-  final String apiKey = Config.apiKey4;
+  // final String apiKey = Config.apiKey4;
 
 
 
@@ -27,7 +27,7 @@ class _OApkScreenState extends State<OApkScreen> {
     }
 
     final String message = _controller.text;
-    // final String? apiKey4 = await Config.getApiKey4();
+    final String? apiKey4 = await Config.getApiKey4();
 
     try {
       final url = Uri.parse(apiUrl);
@@ -36,8 +36,8 @@ class _OApkScreenState extends State<OApkScreen> {
         headers: {
           "Accept": "application/json",
           "Content-Type": "application/json; charset=utf-8",
-          "ApplicationAccessKey": apiKey,
-          // "ApplicationAccessKey": apiKey4 ?? "",
+          // "ApplicationAccessKey": apiKey,
+          "ApplicationAccessKey": apiKey4 ?? "",
         },
         body: jsonEncode({
           "Action": "Add",

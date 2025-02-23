@@ -55,16 +55,17 @@ class _HomePageState extends State<HomePage> {
   Future<void> _fetchPolecaneZawody() async {
   try {
     final url = Uri.parse("https://api.appsheet.com/api/v2/apps/5408db07-71e1-4309-a30a-dc9c7c1ae7a3/tables/Arkusz1/records");
-    final String apiKey2 = Config.apiKey2;
-    // final String? apiKey2 = await Config.getApiKey2();
+    // final String apiKey2 = Config.apiKey2;
+    final String? apiKey2 = await Config.getApiKey2();
+    // print('API Key 2: $apiKey2');
 
     final response = await http.post(
       url,
       headers: {
         "Accept": "application/json",
         "Content-Type": "application/json; charset=utf-8",
-        "ApplicationAccessKey": apiKey2,
-        // "ApplicationAccessKey": apiKey2 ?? "", 
+        // "ApplicationAccessKey": apiKey2,
+        "ApplicationAccessKey": apiKey2 ?? "", 
       },
       body: jsonEncode({    "Action": "Find", // AppSheet wymaga tej akcji do pobierania danych
     "Properties": {
