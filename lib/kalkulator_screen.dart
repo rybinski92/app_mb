@@ -9,6 +9,7 @@ class KalkulatorScreen extends StatefulWidget {
 
 class _KalkulatorScreenState extends State<KalkulatorScreen> {
   final List<String> dystanse = [
+    "-",
     "1 km",
     "5 km",
     "10 km",
@@ -16,8 +17,7 @@ class _KalkulatorScreenState extends State<KalkulatorScreen> {
     "42.195 km"
   ];
 
-  // Kontrolery do kalkulatora tempa biegu
-  String? _wybranyDystans;
+  String? _wybranyDystans = "-";
   final TextEditingController _kmController = TextEditingController();
   final TextEditingController _mController = TextEditingController();
   final TextEditingController _hController = TextEditingController();
@@ -25,16 +25,14 @@ class _KalkulatorScreenState extends State<KalkulatorScreen> {
   final TextEditingController _secController = TextEditingController();
   String _wynikTempo = "--:-- min/km";
 
-  // Kontrolery do kalkulatora czasu odcinka
   final TextEditingController _tempoMinController = TextEditingController();
   final TextEditingController _tempoSecController = TextEditingController();
   final TextEditingController _odcinekKmController = TextEditingController();
   final TextEditingController _odcinekMController = TextEditingController();
   String _wynikCzasOdcinka = "--:--:--";
 
-  // Obliczanie tempa biegu
   void _obliczTempo() {
-    double dystans = _wybranyDystans != null
+    double dystans = (_wybranyDystans != "-" && _wybranyDystans != null)
         ? double.parse(_wybranyDystans!.split(" ")[0])
         : (double.tryParse(_kmController.text) ?? 0) +
             (double.tryParse(_mController.text) ?? 0) / 1000;
@@ -58,7 +56,6 @@ class _KalkulatorScreenState extends State<KalkulatorScreen> {
     }
   }
 
-  // Obliczanie czasu odcinka
   void _obliczCzasOdcinka() {
     double tempoWSekundach =
         ((int.tryParse(_tempoMinController.text) ?? 0).toDouble() * 60) +
@@ -92,9 +89,7 @@ class _KalkulatorScreenState extends State<KalkulatorScreen> {
       ),
       body: Center(
         child: ConstrainedBox(
-          constraints: const BoxConstraints(
-            maxWidth: 700, // Ograniczamy szerokość formularza
-          ),
+          constraints: const BoxConstraints(maxWidth: 700),
           child: Padding(
             padding: const EdgeInsets.all(16.0),
             child: SingleChildScrollView(
@@ -113,66 +108,60 @@ class _KalkulatorScreenState extends State<KalkulatorScreen> {
     );
   }
 
-  // Sekcja TEMPO BIEGU
   Widget _sekcjaTempaBiegu() {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         const Text("Tempo biegu",
-            style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold,  height: 2)),
-        const Text("Wybierz dystans",
-            style: TextStyle(fontSize: 15, fontWeight: FontWeight.bold)),
-        const SizedBox(height: 2),
+            style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
         _poleWybieraniaDystansu(),
-        const SizedBox(height: 8),
-        _poleWprowadzaniaDystansu(),
-        const SizedBox(height: 8),
+        if (_wybranyDystans == "-") _poleWprowadzaniaDystansu(),
         _poleCzasu(),
-        const SizedBox(height: 14),
         _przyciskOblicz(_obliczTempo),
-        const SizedBox(height: 14),
         _wynik("Tempo biegu: $_wynikTempo"),
       ],
     );
   }
 
-  // Sekcja CZAS ODCINKA
   Widget _sekcjaCzasuOdcinka() {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         const Text("Czas odcinka",
-            style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold)),
-        const SizedBox(height: 2),
+            style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
         _poleWprowadzania("Planowane tempo biegu:", _tempoMinController, "min",
             _tempoSecController, "s"),
-        const SizedBox(height: 8),
-        _poleWprowadzania(
-            "Dystans:", _odcinekKmController, "km", _odcinekMController, "m"),
-        const SizedBox(height: 14),
+        _poleWprowadzania("Dystans:", _odcinekKmController, "km",
+            _odcinekMController, "m"),
         _przyciskOblicz(_obliczCzasOdcinka),
-        const SizedBox(height: 14),
         _wynik("Czas odcinka: $_wynikCzasOdcinka"),
       ],
     );
   }
 
-  // Elementy UI
   Widget _poleWybieraniaDystansu() {
-    return DropdownButtonFormField<String>(
-      value: _wybranyDystans,
-      items: dystanse
-          .map((dystans) =>
-              DropdownMenuItem(value: dystans, child: Text(dystans)))
-          .toList(),
-      onChanged: (value) {
-        setState(() {
-          _wybranyDystans = value;
-          _kmController.clear();
-          _mController.clear();
-        });
-      },
-      decoration: const InputDecoration(border: OutlineInputBorder()),
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        const Text("Wybierz dystans",
+            style: TextStyle(fontSize: 15, fontWeight: FontWeight.bold)),
+        const SizedBox(height: 4),
+        DropdownButtonFormField<String>(
+          value: _wybranyDystans,
+          items: dystanse
+              .map((dystans) =>
+                  DropdownMenuItem(value: dystans, child: Text(dystans)))
+              .toList(),
+          onChanged: (value) {
+            setState(() {
+              _wybranyDystans = value;
+              _kmController.clear();
+              _mController.clear();
+            });
+          },
+          decoration: const InputDecoration(border: OutlineInputBorder()),
+        ),
+      ],
     );
   }
 
@@ -187,14 +176,18 @@ class _KalkulatorScreenState extends State<KalkulatorScreen> {
         dodatkowePole: _secController, dodatkowyLabel: "s");
   }
 
-  Widget _poleWprowadzania(String label, TextEditingController ctrl1,
-      String lbl1, TextEditingController ctrl2, String lbl2,
-      {TextEditingController? dodatkowePole, String? dodatkowyLabel}) {
+  Widget _poleWprowadzania(
+      String label,
+      TextEditingController ctrl1,
+      String lbl1,
+      TextEditingController ctrl2,
+      String lbl2,
+      {TextEditingController? dodatkowePole,
+      String? dodatkowyLabel}) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(label,
-            style: const TextStyle(fontSize: 15, fontWeight: FontWeight.bold)),
+        Text(label, style: const TextStyle(fontSize: 15, fontWeight: FontWeight.bold)),
         Row(children: [
           _input(ctrl1, lbl1),
           const SizedBox(width: 8),
@@ -209,30 +202,24 @@ class _KalkulatorScreenState extends State<KalkulatorScreen> {
   }
 
   Widget _input(TextEditingController controller, String label) => Expanded(
-      child: TextField(
+        child: TextField(
           controller: controller,
           keyboardType: TextInputType.number,
-          decoration: InputDecoration(
-              labelText: label, border: const OutlineInputBorder())));
+          decoration: InputDecoration(labelText: label, border: const OutlineInputBorder()),
+        ),
+      );
 
   Widget _przyciskOblicz(VoidCallback onPressed) {
     return Center(
       child: ElevatedButton(
-        style: ElevatedButton.styleFrom(
-          backgroundColor: Colors.orange, // Pomarańczowe tło
-          foregroundColor: Colors.white, // Biały tekst
-          padding: const EdgeInsets.symmetric(horizontal: 40, vertical: 10),
-        ),
+        style: ElevatedButton.styleFrom(backgroundColor: Colors.orange, foregroundColor: Colors.white),
         onPressed: onPressed,
-        child: const Text(
-          "OBLICZ",
-          style: TextStyle(fontSize: 18),
-        ),
+        child: const Text("OBLICZ", style: TextStyle(fontSize: 16)),
       ),
     );
   }
 
   Widget _wynik(String text) => Center(
-      child: Text(text,
-          style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold)));
+        child: Text(text, style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
+      );
 }

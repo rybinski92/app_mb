@@ -96,7 +96,7 @@ class _OApkScreenState extends State<OApkScreen> {
                   "Jeśli widzisz błąd, masz propozycję współpracy lub chcesz zostać Partnerem aplikacji, "
                   "skontaktuj się z nami:\n\n",
                   textAlign: TextAlign.center,
-                  style: TextStyle(fontSize: 17),
+                  style: TextStyle(fontSize: 15),
                 ),
 
                 // Pole tekstowe do wiadomości
@@ -123,7 +123,7 @@ class _OApkScreenState extends State<OApkScreen> {
                   onPressed: _sendMessageToAppSheet,
                   child: const Text(
                     "Wyślij wiadomość",
-                    style: TextStyle(fontSize: 18, color: Colors.white),
+                    style: TextStyle(fontSize: 16, color: Colors.white),
                   ),
                 ),
                 const SizedBox(height: 30),
@@ -139,7 +139,7 @@ class _OApkScreenState extends State<OApkScreen> {
                       const Text(
                         "adam.mojbieg@gmail.com",
                         style: TextStyle(
-                            fontSize: 18, fontWeight: FontWeight.bold),
+                            fontSize: 16, fontWeight: FontWeight.bold),
                       ),
                     ],
                   ),
@@ -156,7 +156,7 @@ class _OApkScreenState extends State<OApkScreen> {
                   onPressed: () => Navigator.pop(context),
                   child: const Text(
                     "Powrót",
-                    style: TextStyle(fontSize: 18, color: Colors.white),
+                    style: TextStyle(fontSize: 16, color: Colors.white),
                   ),
                 ),
 
@@ -165,7 +165,7 @@ class _OApkScreenState extends State<OApkScreen> {
                 // Nazwa aplikacji na dole
                 const Text(
                   "a10i",
-                  style: TextStyle(fontSize: 22),
+                  style: TextStyle(fontSize: 18),
                   textAlign: TextAlign.center,
                 ),
               ],

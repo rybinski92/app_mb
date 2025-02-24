@@ -30,16 +30,16 @@ class PartnerzyScreen extends StatelessWidget {
             child: Column(
               children: [
                 // Lista partnerów
-                // _buildPartnerCard(
-                //   "Sportiva",
-                //   "zdjecia/partnerzy/sportiva.jpg",
-                //   "https://www.sportiva.pl/",
-                // ),
-                // const SizedBox(height: 20),
+                _buildPartnerCard(
+                  "Gmoto",
+                  "zdjecia/partnerzy/gmoto.jpg",
+                  "https://gmoto.pl/",
+                ),
+                const SizedBox(height: 20),
                 _buildPartnerCard(
                   "Zen.com Expo",
                   "zdjecia/partnerzy/zen_com.jpg",
-                  "https://stage.expo.zen.com/",
+                  "https://expo.zen.com/",
                 ),
                 const SizedBox(height: 30),
 
@@ -61,7 +61,7 @@ class PartnerzyScreen extends StatelessWidget {
                   },
                   child: const Text(
                     'Zostań Partnerem',
-                    style: TextStyle(fontSize: 18, color: Colors.white),
+                    style: TextStyle(fontSize: 14, color: Colors.white),
                   ),
                 ),
               ],

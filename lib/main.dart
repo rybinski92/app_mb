@@ -211,7 +211,7 @@ String _handlePolishCharacters(String text) {
                     MaterialPageRoute(builder: (context) => const RecommendedZawodyScreen()),
                   );
                 },
-                child: const Text("Polecane zawody", style: TextStyle(fontSize: 18)),
+                child: const Text("Polecane zawody", style: TextStyle(fontSize: 14)),
               ),
             ),
 
@@ -242,7 +242,7 @@ String _handlePolishCharacters(String text) {
                   Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      _buildButton(context, "Przejdź do zawodów", () {
+                      _buildButton(context, "Lista zawodów", () {
                       Navigator.push(
                         context,
                         MaterialPageRoute(builder: (context) => const ZawodyScreen()),
@@ -262,11 +262,11 @@ String _handlePolishCharacters(String text) {
                         Navigator.push(context, MaterialPageRoute(builder: (context) => const PartnerzyScreen()));
                       }),
                       const SizedBox(width: 13),
-                      _buildButton(context, "Kalkulator 🏃", () {
+                      _buildButton(context, "Kalkulator", () {
                         Navigator.push(context, MaterialPageRoute(builder: (context) => const KalkulatorScreen()));
                       }),
                       const SizedBox(width: 11),
-                      _buildButton(context, "ℹ📯", () {
+                      _buildButton(context, "📩", () {
                         Navigator.push(context, MaterialPageRoute(builder: (context) => const OApkScreen()));
                       }),
                     ],
@@ -289,7 +289,7 @@ String _handlePolishCharacters(String text) {
         padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
       ),
       onPressed: onPressed,
-      child: Text(text, style: const TextStyle(fontSize: 18)),
+      child: Text(text, style: const TextStyle(fontSize: 14)),
     );
   }
 
@@ -305,7 +305,7 @@ String _handlePolishCharacters(String text) {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text(zawod["nazwa"] ?? '', style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+              Text(zawod["nazwa"] ?? '', style: const TextStyle(fontSize: 14, fontWeight: FontWeight.bold)),
               const SizedBox(height: 5),
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
