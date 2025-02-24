@@ -117,6 +117,7 @@ class _KalkulatorScreenState extends State<KalkulatorScreen> {
         _poleWybieraniaDystansu(),
         if (_wybranyDystans == "-") _poleWprowadzaniaDystansu(),
         _poleCzasu(),
+        const SizedBox(height: 7), // Delikatny odstęp przed przyciskiem
         _przyciskOblicz(_obliczTempo),
         _wynik("Tempo biegu: $_wynikTempo"),
       ],
@@ -133,6 +134,7 @@ class _KalkulatorScreenState extends State<KalkulatorScreen> {
             _tempoSecController, "s"),
         _poleWprowadzania("Dystans:", _odcinekKmController, "km",
             _odcinekMController, "m"),
+        const SizedBox(height: 7), // Delikatny odstęp przed przyciskiem
         _przyciskOblicz(_obliczCzasOdcinka),
         _wynik("Czas odcinka: $_wynikCzasOdcinka"),
       ],
