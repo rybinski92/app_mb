@@ -55,17 +55,16 @@ class _HomePageState extends State<HomePage> {
   Future<void> _fetchPolecaneZawody() async {
   try {
     final url = Uri.parse("https://api.appsheet.com/api/v2/apps/5408db07-71e1-4309-a30a-dc9c7c1ae7a3/tables/Arkusz1/records");
-    // final String apiKey2 = Config.apiKey2;
-    final String? apiKey2 = await Config.getApiKey2();
-    // print('API Key 2: $apiKey2');
+    final String apiKey2 = Config.apiKey2;
+    // final String? apiKey2 = await Config.getApiKey2();
 
     final response = await http.post(
       url,
       headers: {
         "Accept": "application/json",
         "Content-Type": "application/json; charset=utf-8",
-        // "ApplicationAccessKey": apiKey2,
-        "ApplicationAccessKey": apiKey2 ?? "", 
+        "ApplicationAccessKey": apiKey2,
+        // "ApplicationAccessKey": apiKey2 ?? "", 
       },
       body: jsonEncode({    "Action": "Find", // AppSheet wymaga tej akcji do pobierania danych
     "Properties": {
@@ -212,7 +211,7 @@ String _handlePolishCharacters(String text) {
                     MaterialPageRoute(builder: (context) => const RecommendedZawodyScreen()),
                   );
                 },
-                child: const Text("Polecane zawody", style: TextStyle(fontSize: 18)),
+                child: const Text("Polecane zawody", style: TextStyle(fontSize: 14)),
               ),
             ),
 
@@ -243,7 +242,7 @@ String _handlePolishCharacters(String text) {
                   Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      _buildButton(context, "Przejdź do zawodów", () {
+                      _buildButton(context, "Lista zawodów", () {
                       Navigator.push(
                         context,
                         MaterialPageRoute(builder: (context) => const ZawodyScreen()),
@@ -263,11 +262,11 @@ String _handlePolishCharacters(String text) {
                         Navigator.push(context, MaterialPageRoute(builder: (context) => const PartnerzyScreen()));
                       }),
                       const SizedBox(width: 13),
-                      _buildButton(context, "Kalkulator 🏃", () {
+                      _buildButton(context, "Kalkulator", () {
                         Navigator.push(context, MaterialPageRoute(builder: (context) => const KalkulatorScreen()));
                       }),
                       const SizedBox(width: 11),
-                      _buildButton(context, "ℹ📯", () {
+                      _buildButton(context, "📩", () {
                         Navigator.push(context, MaterialPageRoute(builder: (context) => const OApkScreen()));
                       }),
                     ],
@@ -290,7 +289,7 @@ String _handlePolishCharacters(String text) {
         padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
       ),
       onPressed: onPressed,
-      child: Text(text, style: const TextStyle(fontSize: 18)),
+      child: Text(text, style: const TextStyle(fontSize: 14)),
     );
   }
 
@@ -306,7 +305,7 @@ String _handlePolishCharacters(String text) {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text(zawod["nazwa"] ?? '', style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+              Text(zawod["nazwa"] ?? '', style: const TextStyle(fontSize: 14, fontWeight: FontWeight.bold)),
               const SizedBox(height: 5),
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,

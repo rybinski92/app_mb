@@ -1,0 +1,210 @@
+1<?xml version="1.0" encoding="utf-8"?>
+2<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+3    package="com.a10i.app_kb"
+4    android:versionCode="5"
+5    android:versionName="1.0.0" >
+6
+7    <uses-sdk
+8        android:minSdkVersion="21"
+9        android:targetSdkVersion="35" />
+10
+11    <uses-permission android:name="android.permission.INTERNET" />
+11-->C:\Users\User\Desktop\kiedy_biegam_app2\app_kb\android\app\src\main\AndroidManifest.xml:3:5-66
+11-->C:\Users\User\Desktop\kiedy_biegam_app2\app_kb\android\app\src\main\AndroidManifest.xml:3:22-64
+12    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+12-->C:\Users\User\Desktop\kiedy_biegam_app2\app_kb\android\app\src\main\AndroidManifest.xml:4:5-78
+12-->C:\Users\User\Desktop\kiedy_biegam_app2\app_kb\android\app\src\main\AndroidManifest.xml:4:22-76
+13    <!--
+14         Required to query activities that can process text, see:
+15         https://developer.android.com/training/package-visibility and
+16         https://developer.android.com/reference/android/content/Intent#ACTION_PROCESS_TEXT.
+17
+18         In particular, this is used by the Flutter engine in io.flutter.plugin.text.ProcessTextPlugin.
+19    -->
+20    <queries>
+20-->C:\Users\User\Desktop\kiedy_biegam_app2\app_kb\android\app\src\main\AndroidManifest.xml:43:5-54:15
+21        <intent>
+21-->C:\Users\User\Desktop\kiedy_biegam_app2\app_kb\android\app\src\main\AndroidManifest.xml:44:9-47:18
+22            <action android:name="android.intent.action.PROCESS_TEXT" />
+22-->C:\Users\User\Desktop\kiedy_biegam_app2\app_kb\android\app\src\main\AndroidManifest.xml:45:13-72
+22-->C:\Users\User\Desktop\kiedy_biegam_app2\app_kb\android\app\src\main\AndroidManifest.xml:45:21-70
+23
+24            <data android:mimeType="text/plain" />
+24-->C:\Users\User\Desktop\kiedy_biegam_app2\app_kb\android\app\src\main\AndroidManifest.xml:46:13-50
+24-->C:\Users\User\Desktop\kiedy_biegam_app2\app_kb\android\app\src\main\AndroidManifest.xml:46:19-48
+25        </intent>
+26        <intent>
+26-->C:\Users\User\Desktop\kiedy_biegam_app2\app_kb\android\app\src\main\AndroidManifest.xml:49:9-53:18
+27            <action android:name="android.intent.action.VIEW" />
+27-->C:\Users\User\Desktop\kiedy_biegam_app2\app_kb\android\app\src\main\AndroidManifest.xml:50:13-64
+27-->C:\Users\User\Desktop\kiedy_biegam_app2\app_kb\android\app\src\main\AndroidManifest.xml:50:21-62
+28
+29            <category android:name="android.intent.category.BROWSABLE" />
+29-->C:\Users\User\Desktop\kiedy_biegam_app2\app_kb\android\app\src\main\AndroidManifest.xml:51:13-73
+29-->C:\Users\User\Desktop\kiedy_biegam_app2\app_kb\android\app\src\main\AndroidManifest.xml:51:23-71
+30
+31            <data android:scheme="https" />
+31-->C:\Users\User\Desktop\kiedy_biegam_app2\app_kb\android\app\src\main\AndroidManifest.xml:46:13-50
+31-->C:\Users\User\Desktop\kiedy_biegam_app2\app_kb\android\app\src\main\AndroidManifest.xml:52:19-41
+32        </intent>
+33    </queries>
+34
+35    <permission
+35-->[androidx.core:core:1.13.1] C:\Users\User\.gradle\caches\transforms-3\360c14694bafdd7df0a7c68f20cb35a5\transformed\core-1.13.1\AndroidManifest.xml:22:5-24:47
+36        android:name="com.a10i.app_kb.DYNAMIC_RECEIVER_NOT_EXPORTED_PERMISSION"
+36-->[androidx.core:core:1.13.1] C:\Users\User\.gradle\caches\transforms-3\360c14694bafdd7df0a7c68f20cb35a5\transformed\core-1.13.1\AndroidManifest.xml:23:9-81
+37        android:protectionLevel="signature" />
+37-->[androidx.core:core:1.13.1] C:\Users\User\.gradle\caches\transforms-3\360c14694bafdd7df0a7c68f20cb35a5\transformed\core-1.13.1\AndroidManifest.xml:24:9-44
+38
+39    <uses-permission android:name="com.a10i.app_kb.DYNAMIC_RECEIVER_NOT_EXPORTED_PERMISSION" />
+39-->[androidx.core:core:1.13.1] C:\Users\User\.gradle\caches\transforms-3\360c14694bafdd7df0a7c68f20cb35a5\transformed\core-1.13.1\AndroidManifest.xml:26:5-97
+39-->[androidx.core:core:1.13.1] C:\Users\User\.gradle\caches\transforms-3\360c14694bafdd7df0a7c68f20cb35a5\transformed\core-1.13.1\AndroidManifest.xml:26:22-94
+40
+41    <application
+42        android:name="android.app.Application"
+42-->C:\Users\User\Desktop\kiedy_biegam_app2\app_kb\android\app\src\main\AndroidManifest.xml:8:9-42
+43        android:appComponentFactory="androidx.core.app.CoreComponentFactory"
+43-->[androidx.core:core:1.13.1] C:\Users\User\.gradle\caches\transforms-3\360c14694bafdd7df0a7c68f20cb35a5\transformed\core-1.13.1\AndroidManifest.xml:28:18-86
+44        android:extractNativeLibs="true"
+45        android:icon="@mipmap/ic_launcher"
+45-->C:\Users\User\Desktop\kiedy_biegam_app2\app_kb\android\app\src\main\AndroidManifest.xml:9:9-43
+46        android:label="Mój bieg" >
+46-->C:\Users\User\Desktop\kiedy_biegam_app2\app_kb\android\app\src\main\AndroidManifest.xml:7:9-33
+47        <activity
+47-->C:\Users\User\Desktop\kiedy_biegam_app2\app_kb\android\app\src\main\AndroidManifest.xml:10:9-31:20
+48            android:name="com.a10i.app_kb.MainActivity"
+48-->C:\Users\User\Desktop\kiedy_biegam_app2\app_kb\android\app\src\main\AndroidManifest.xml:11:13-41
+49            android:configChanges="orientation|keyboardHidden|keyboard|screenSize|smallestScreenSize|locale|layoutDirection|fontScale|screenLayout|density|uiMode"
+49-->C:\Users\User\Desktop\kiedy_biegam_app2\app_kb\android\app\src\main\AndroidManifest.xml:16:13-163
+50            android:exported="true"
+50-->C:\Users\User\Desktop\kiedy_biegam_app2\app_kb\android\app\src\main\AndroidManifest.xml:12:13-36
+51            android:hardwareAccelerated="true"
+51-->C:\Users\User\Desktop\kiedy_biegam_app2\app_kb\android\app\src\main\AndroidManifest.xml:17:13-47
+52            android:launchMode="singleTop"
+52-->C:\Users\User\Desktop\kiedy_biegam_app2\app_kb\android\app\src\main\AndroidManifest.xml:13:13-43
+53            android:taskAffinity=""
+53-->C:\Users\User\Desktop\kiedy_biegam_app2\app_kb\android\app\src\main\AndroidManifest.xml:14:13-36
+54            android:theme="@style/LaunchTheme"
+54-->C:\Users\User\Desktop\kiedy_biegam_app2\app_kb\android\app\src\main\AndroidManifest.xml:15:13-47
+55            android:windowSoftInputMode="adjustResize" >
+55-->C:\Users\User\Desktop\kiedy_biegam_app2\app_kb\android\app\src\main\AndroidManifest.xml:18:13-55
+56
+57            <!--
+58                 Specifies an Android theme to apply to this Activity as soon as
+59                 the Android process has started. This theme is visible to the user
+60                 while the Flutter UI initializes. After that, this theme continues
+61                 to determine the Window background behind the Flutter UI.
+62            -->
+63            <meta-data
+63-->C:\Users\User\Desktop\kiedy_biegam_app2\app_kb\android\app\src\main\AndroidManifest.xml:23:13-26:17
+64                android:name="io.flutter.embedding.android.NormalTheme"
+64-->C:\Users\User\Desktop\kiedy_biegam_app2\app_kb\android\app\src\main\AndroidManifest.xml:24:15-70
+65                android:resource="@style/NormalTheme" />
+65-->C:\Users\User\Desktop\kiedy_biegam_app2\app_kb\android\app\src\main\AndroidManifest.xml:25:15-52
+66
+67            <intent-filter>
+67-->C:\Users\User\Desktop\kiedy_biegam_app2\app_kb\android\app\src\main\AndroidManifest.xml:27:13-30:29
+68                <action android:name="android.intent.action.MAIN" />
+68-->C:\Users\User\Desktop\kiedy_biegam_app2\app_kb\android\app\src\main\AndroidManifest.xml:28:17-68
+68-->C:\Users\User\Desktop\kiedy_biegam_app2\app_kb\android\app\src\main\AndroidManifest.xml:28:25-66
+69
+70                <category android:name="android.intent.category.LAUNCHER" />
+70-->C:\Users\User\Desktop\kiedy_biegam_app2\app_kb\android\app\src\main\AndroidManifest.xml:29:17-76
+70-->C:\Users\User\Desktop\kiedy_biegam_app2\app_kb\android\app\src\main\AndroidManifest.xml:29:27-74
+71            </intent-filter>
+72        </activity>
+73        <!--
+74             Don't delete the meta-data below.
+75             This is used by the Flutter tool to generate GeneratedPluginRegistrant.java
+76        -->
+77        <meta-data
+77-->C:\Users\User\Desktop\kiedy_biegam_app2\app_kb\android\app\src\main\AndroidManifest.xml:34:9-36:33
+78            android:name="flutterEmbedding"
+78-->C:\Users\User\Desktop\kiedy_biegam_app2\app_kb\android\app\src\main\AndroidManifest.xml:35:13-44
+79            android:value="2" />
+79-->C:\Users\User\Desktop\kiedy_biegam_app2\app_kb\android\app\src\main\AndroidManifest.xml:36:13-30
+80
+81        <activity
+81-->[:url_launcher_android] C:\Users\User\Desktop\kiedy_biegam_app2\app_kb\build\url_launcher_android\intermediates\merged_manifest\release\AndroidManifest.xml:8:9-11:74
+82            android:name="io.flutter.plugins.urllauncher.WebViewActivity"
+82-->[:url_launcher_android] C:\Users\User\Desktop\kiedy_biegam_app2\app_kb\build\url_launcher_android\intermediates\merged_manifest\release\AndroidManifest.xml:9:13-74
+83            android:exported="false"
+83-->[:url_launcher_android] C:\Users\User\Desktop\kiedy_biegam_app2\app_kb\build\url_launcher_android\intermediates\merged_manifest\release\AndroidManifest.xml:10:13-37
+84            android:theme="@android:style/Theme.NoTitleBar.Fullscreen" />
+84-->[:url_launcher_android] C:\Users\User\Desktop\kiedy_biegam_app2\app_kb\build\url_launcher_android\intermediates\merged_manifest\release\AndroidManifest.xml:11:13-71
+85
+86        <uses-library
+86-->[androidx.window:window:1.2.0] C:\Users\User\.gradle\caches\transforms-3\469f715edc66045675cc1afb54e8ab0e\transformed\jetified-window-1.2.0\AndroidManifest.xml:23:9-25:40
+87            android:name="androidx.window.extensions"
+87-->[androidx.window:window:1.2.0] C:\Users\User\.gradle\caches\transforms-3\469f715edc66045675cc1afb54e8ab0e\transformed\jetified-window-1.2.0\AndroidManifest.xml:24:13-54
+88            android:required="false" />
+88-->[androidx.window:window:1.2.0] C:\Users\User\.gradle\caches\transforms-3\469f715edc66045675cc1afb54e8ab0e\transformed\jetified-window-1.2.0\AndroidManifest.xml:25:13-37
+89        <uses-library
+89-->[androidx.window:window:1.2.0] C:\Users\User\.gradle\caches\transforms-3\469f715edc66045675cc1afb54e8ab0e\transformed\jetified-window-1.2.0\AndroidManifest.xml:26:9-28:40
+90            android:name="androidx.window.sidecar"
+90-->[androidx.window:window:1.2.0] C:\Users\User\.gradle\caches\transforms-3\469f715edc66045675cc1afb54e8ab0e\transformed\jetified-window-1.2.0\AndroidManifest.xml:27:13-51
+91            android:required="false" />
+91-->[androidx.window:window:1.2.0] C:\Users\User\.gradle\caches\transforms-3\469f715edc66045675cc1afb54e8ab0e\transformed\jetified-window-1.2.0\AndroidManifest.xml:28:13-37
+92
+93        <provider
+93-->[androidx.lifecycle:lifecycle-process:2.7.0] C:\Users\User\.gradle\caches\transforms-3\56e3795ded0cd3205cf5aa9a76e8b997\transformed\jetified-lifecycle-process-2.7.0\AndroidManifest.xml:24:9-32:20
+94            android:name="androidx.startup.InitializationProvider"
+94-->[androidx.lifecycle:lifecycle-process:2.7.0] C:\Users\User\.gradle\caches\transforms-3\56e3795ded0cd3205cf5aa9a76e8b997\transformed\jetified-lifecycle-process-2.7.0\AndroidManifest.xml:25:13-67
+95            android:authorities="com.a10i.app_kb.androidx-startup"
+95-->[androidx.lifecycle:lifecycle-process:2.7.0] C:\Users\User\.gradle\caches\transforms-3\56e3795ded0cd3205cf5aa9a76e8b997\transformed\jetified-lifecycle-process-2.7.0\AndroidManifest.xml:26:13-68
+96            android:exported="false" >
+96-->[androidx.lifecycle:lifecycle-process:2.7.0] C:\Users\User\.gradle\caches\transforms-3\56e3795ded0cd3205cf5aa9a76e8b997\transformed\jetified-lifecycle-process-2.7.0\AndroidManifest.xml:27:13-37
+97            <meta-data
+97-->[androidx.lifecycle:lifecycle-process:2.7.0] C:\Users\User\.gradle\caches\transforms-3\56e3795ded0cd3205cf5aa9a76e8b997\transformed\jetified-lifecycle-process-2.7.0\AndroidManifest.xml:29:13-31:52
+98                android:name="androidx.lifecycle.ProcessLifecycleInitializer"
+98-->[androidx.lifecycle:lifecycle-process:2.7.0] C:\Users\User\.gradle\caches\transforms-3\56e3795ded0cd3205cf5aa9a76e8b997\transformed\jetified-lifecycle-process-2.7.0\AndroidManifest.xml:30:17-78
+99                android:value="androidx.startup" />
+99-->[androidx.lifecycle:lifecycle-process:2.7.0] C:\Users\User\.gradle\caches\transforms-3\56e3795ded0cd3205cf5aa9a76e8b997\transformed\jetified-lifecycle-process-2.7.0\AndroidManifest.xml:31:17-49
+100            <meta-data
+100-->[androidx.profileinstaller:profileinstaller:1.3.1] C:\Users\User\.gradle\caches\transforms-3\8976643fef93f0c041d5f6510074d7f4\transformed\jetified-profileinstaller-1.3.1\AndroidManifest.xml:29:13-31:52
+101                android:name="androidx.profileinstaller.ProfileInstallerInitializer"
+101-->[androidx.profileinstaller:profileinstaller:1.3.1] C:\Users\User\.gradle\caches\transforms-3\8976643fef93f0c041d5f6510074d7f4\transformed\jetified-profileinstaller-1.3.1\AndroidManifest.xml:30:17-85
+102                android:value="androidx.startup" />
+102-->[androidx.profileinstaller:profileinstaller:1.3.1] C:\Users\User\.gradle\caches\transforms-3\8976643fef93f0c041d5f6510074d7f4\transformed\jetified-profileinstaller-1.3.1\AndroidManifest.xml:31:17-49
+103        </provider>
+104
+105        <receiver
+105-->[androidx.profileinstaller:profileinstaller:1.3.1] C:\Users\User\.gradle\caches\transforms-3\8976643fef93f0c041d5f6510074d7f4\transformed\jetified-profileinstaller-1.3.1\AndroidManifest.xml:34:9-52:20
+106            android:name="androidx.profileinstaller.ProfileInstallReceiver"
+106-->[androidx.profileinstaller:profileinstaller:1.3.1] C:\Users\User\.gradle\caches\transforms-3\8976643fef93f0c041d5f6510074d7f4\transformed\jetified-profileinstaller-1.3.1\AndroidManifest.xml:35:13-76
+107            android:directBootAware="false"
+107-->[androidx.profileinstaller:profileinstaller:1.3.1] C:\Users\User\.gradle\caches\transforms-3\8976643fef93f0c041d5f6510074d7f4\transformed\jetified-profileinstaller-1.3.1\AndroidManifest.xml:36:13-44
+108            android:enabled="true"
+108-->[androidx.profileinstaller:profileinstaller:1.3.1] C:\Users\User\.gradle\caches\transforms-3\8976643fef93f0c041d5f6510074d7f4\transformed\jetified-profileinstaller-1.3.1\AndroidManifest.xml:37:13-35
+109            android:exported="true"
+109-->[androidx.profileinstaller:profileinstaller:1.3.1] C:\Users\User\.gradle\caches\transforms-3\8976643fef93f0c041d5f6510074d7f4\transformed\jetified-profileinstaller-1.3.1\AndroidManifest.xml:38:13-36
+110            android:permission="android.permission.DUMP" >
+110-->[androidx.profileinstaller:profileinstaller:1.3.1] C:\Users\User\.gradle\caches\transforms-3\8976643fef93f0c041d5f6510074d7f4\transformed\jetified-profileinstaller-1.3.1\AndroidManifest.xml:39:13-57
+111            <intent-filter>
+111-->[androidx.profileinstaller:profileinstaller:1.3.1] C:\Users\User\.gradle\caches\transforms-3\8976643fef93f0c041d5f6510074d7f4\transformed\jetified-profileinstaller-1.3.1\AndroidManifest.xml:40:13-42:29
+112                <action android:name="androidx.profileinstaller.action.INSTALL_PROFILE" />
+112-->[androidx.profileinstaller:profileinstaller:1.3.1] C:\Users\User\.gradle\caches\transforms-3\8976643fef93f0c041d5f6510074d7f4\transformed\jetified-profileinstaller-1.3.1\AndroidManifest.xml:41:17-91
+112-->[androidx.profileinstaller:profileinstaller:1.3.1] C:\Users\User\.gradle\caches\transforms-3\8976643fef93f0c041d5f6510074d7f4\transformed\jetified-profileinstaller-1.3.1\AndroidManifest.xml:41:25-88
+113            </intent-filter>
+114            <intent-filter>
+114-->[androidx.profileinstaller:profileinstaller:1.3.1] C:\Users\User\.gradle\caches\transforms-3\8976643fef93f0c041d5f6510074d7f4\transformed\jetified-profileinstaller-1.3.1\AndroidManifest.xml:43:13-45:29
+115                <action android:name="androidx.profileinstaller.action.SKIP_FILE" />
+115-->[androidx.profileinstaller:profileinstaller:1.3.1] C:\Users\User\.gradle\caches\transforms-3\8976643fef93f0c041d5f6510074d7f4\transformed\jetified-profileinstaller-1.3.1\AndroidManifest.xml:44:17-85
+115-->[androidx.profileinstaller:profileinstaller:1.3.1] C:\Users\User\.gradle\caches\transforms-3\8976643fef93f0c041d5f6510074d7f4\transformed\jetified-profileinstaller-1.3.1\AndroidManifest.xml:44:25-82
+116            </intent-filter>
+117            <intent-filter>
+117-->[androidx.profileinstaller:profileinstaller:1.3.1] C:\Users\User\.gradle\caches\transforms-3\8976643fef93f0c041d5f6510074d7f4\transformed\jetified-profileinstaller-1.3.1\AndroidManifest.xml:46:13-48:29
+118                <action android:name="androidx.profileinstaller.action.SAVE_PROFILE" />
+118-->[androidx.profileinstaller:profileinstaller:1.3.1] C:\Users\User\.gradle\caches\transforms-3\8976643fef93f0c041d5f6510074d7f4\transformed\jetified-profileinstaller-1.3.1\AndroidManifest.xml:47:17-88
+118-->[androidx.profileinstaller:profileinstaller:1.3.1] C:\Users\User\.gradle\caches\transforms-3\8976643fef93f0c041d5f6510074d7f4\transformed\jetified-profileinstaller-1.3.1\AndroidManifest.xml:47:25-85
+119            </intent-filter>
+120            <intent-filter>
+120-->[androidx.profileinstaller:profileinstaller:1.3.1] C:\Users\User\.gradle\caches\transforms-3\8976643fef93f0c041d5f6510074d7f4\transformed\jetified-profileinstaller-1.3.1\AndroidManifest.xml:49:13-51:29
+121                <action android:name="androidx.profileinstaller.action.BENCHMARK_OPERATION" />
+121-->[androidx.profileinstaller:profileinstaller:1.3.1] C:\Users\User\.gradle\caches\transforms-3\8976643fef93f0c041d5f6510074d7f4\transformed\jetified-profileinstaller-1.3.1\AndroidManifest.xml:50:17-95
+121-->[androidx.profileinstaller:profileinstaller:1.3.1] C:\Users\User\.gradle\caches\transforms-3\8976643fef93f0c041d5f6510074d7f4\transformed\jetified-profileinstaller-1.3.1\AndroidManifest.xml:50:25-92
+122            </intent-filter>
+123        </receiver>
+124    </application>
+125
+126</manifest>

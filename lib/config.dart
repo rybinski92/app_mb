@@ -1,26 +1,18 @@
-import 'package:flutter/services.dart';
-
 class Config {
-  static const MethodChannel _channel = MethodChannel('config');
-
-  static Future<String?> getApiKey1() async {
-    final String? apiKey1 = await _channel.invokeMethod('getApiKey1');
-    return apiKey1;
-  }
-
-  static Future<String?> getApiKey2() async {
-    final String? apiKey2 = await _channel.invokeMethod('getApiKey2');
-    // print("Received API Key 2: $apiKey2");  
-    return apiKey2;
-  }
-
-  static Future<String?> getApiKey3() async {
-    final String? apiKey3 = await _channel.invokeMethod('getApiKey3');
-    return apiKey3;
-  }
-
-  static Future<String?> getApiKey4() async {
-    final String? apiKey4 = await _channel.invokeMethod('getApiKey4');
-    return apiKey4;
-  }
+  static String apiKey1 = const String.fromEnvironment(
+    'APPSHEET_API_KEY_1', 
+    defaultValue: 'default_key_1'
+  );
+  static String apiKey2 = const String.fromEnvironment(
+    'APPSHEET_API_KEY_2', 
+    defaultValue: 'default_key_2'
+  );
+  static String apiKey3 = const String.fromEnvironment(
+    'APPSHEET_API_KEY_3', 
+    defaultValue: 'default_key_3'
+  );
+  static String apiKey4 = const String.fromEnvironment(
+    'APPSHEET_API_KEY_4', 
+    defaultValue: 'default_key_4'
+  );
 }

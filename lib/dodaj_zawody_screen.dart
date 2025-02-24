@@ -162,7 +162,7 @@ class _DodajZawodyScreenState extends State<DodajZawodyScreen> {
       onPressed: () => _sendToAppSheet(),
       child: const Text(
         'Zapisz',
-        style: TextStyle(fontSize: 18),
+        style: TextStyle(fontSize: 16),
       ),
     );
   }
@@ -187,8 +187,8 @@ class _DodajZawodyScreenState extends State<DodajZawodyScreen> {
     const String apiUrl =
         "https://api.appsheet.com/api/v2/apps/57025f21-4219-4291-ba75-6745b608e965/tables/Arkusz1/Add";
 
-    // const String applicationAccessKey = Config.apiKey1;  
-    final String? apiKey1 = await Config.getApiKey1(); 
+    const String applicationAccessKey = Config.apiKey1;  
+    // final String? apiKey1 = await Config.getApiKey1(); 
 
     if (_nazwaController.text.isEmpty ||
         _selectedDate == null ||
@@ -219,8 +219,8 @@ class _DodajZawodyScreenState extends State<DodajZawodyScreen> {
         Uri.parse(apiUrl),
         headers: {
           "Content-Type": "application/json",
-          // "ApplicationAccessKey": applicationAccessKey, 
-          "ApplicationAccessKey": apiKey1 ?? "",
+          "ApplicationAccessKey": applicationAccessKey, 
+          // "ApplicationAccessKey": apiKey1 ?? "",
         },
         body: jsonEncode(zawodyData),
       );

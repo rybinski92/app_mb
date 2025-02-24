@@ -42,7 +42,7 @@ class RecommendedZawodyScreen extends StatelessWidget {
                   "nazwa zawodów, data, miejsce, województwo, link do strony zawodów. "
                   "Dodanie zawodów do tej sekcji wiąże się z opłatą, którą podamy w odpowiedzi na mail.",
                   textAlign: TextAlign.center,
-                  style: TextStyle(fontSize: 18),
+                  style: TextStyle(fontSize: 15),
                 ),
                 const SizedBox(height: 30),
 
@@ -57,7 +57,7 @@ class RecommendedZawodyScreen extends StatelessWidget {
                       const Text(
                         "adam.mojbieg@gmail.com",
                         style: TextStyle(
-                            fontSize: 18, fontWeight: FontWeight.bold),
+                            fontSize: 15, fontWeight: FontWeight.bold),
                       ),
                     ],
                   ),
@@ -74,7 +74,7 @@ class RecommendedZawodyScreen extends StatelessWidget {
                   onPressed: () => Navigator.pop(context),
                   child: const Text(
                     "Powrót",
-                    style: TextStyle(fontSize: 18, color: Colors.white),
+                    style: TextStyle(fontSize: 16, color: Colors.white),
                   ),
                 ),
               ],

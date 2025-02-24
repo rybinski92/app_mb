@@ -23,7 +23,7 @@ class _ZawodyScreenState extends State<ZawodyScreen> {
   bool _pokazFiltry = true; // <-- Nowa zmienna do sterowania widocznością filtrów
 
   final String apiUrl = "https://api.appsheet.com/api/v2/apps/566e1354-d7f1-49a1-bb85-6ce2f26ce8b4/tables/zawody/records";
-  // final String apiKey = Config.apiKey3;
+  final String apiKey = Config.apiKey3;
   
 
   final Map<String, int> miesiaceKolejnosc = {
@@ -51,14 +51,14 @@ class _ZawodyScreenState extends State<ZawodyScreen> {
   Future<void> _pobierzDaneZAppSheet() async {
     try {
       final url = Uri.parse(apiUrl);
-      final String? apiKey3 = await Config.getApiKey3();
+      // final String? apiKey3 = await Config.getApiKey3();
       final response = await http.post(
         url,
         headers: {
           "Accept": "application/json",
           "Content-Type": "application/json; charset=utf-8",
-          // "ApplicationAccessKey": apiKey,
-          "ApplicationAccessKey": apiKey3 ?? "", 
+          "ApplicationAccessKey": apiKey,
+          // "ApplicationAccessKey": apiKey3 ?? "", 
         },
         body: jsonEncode({
           "Action": "Find",

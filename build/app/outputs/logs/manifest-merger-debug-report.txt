@@ -23,8 +23,8 @@ MERGED from [androidx.versionedparcelable:versionedparcelable:1.1.1] C:\Users\Us
 	android:name
 		INJECTED from C:\Users\User\Desktop\kiedy_biegam_app2\app_kb\android\app\src\main\AndroidManifest.xml
 manifest
-ADDED from C:\Users\User\Desktop\kiedy_biegam_app2\app_kb\android\app\src\main\AndroidManifest.xml:1:1-49:12
-MERGED from C:\Users\User\Desktop\kiedy_biegam_app2\app_kb\android\app\src\main\AndroidManifest.xml:1:1-49:12
+ADDED from C:\Users\User\Desktop\kiedy_biegam_app2\app_kb\android\app\src\main\AndroidManifest.xml:1:1-55:12
+MERGED from C:\Users\User\Desktop\kiedy_biegam_app2\app_kb\android\app\src\main\AndroidManifest.xml:1:1-55:12
 INJECTED from C:\Users\User\Desktop\kiedy_biegam_app2\app_kb\android\app\src\debug\AndroidManifest.xml:1:1-7:12
 INJECTED from C:\Users\User\Desktop\kiedy_biegam_app2\app_kb\android\app\src\debug\AndroidManifest.xml:1:1-7:12
 INJECTED from C:\Users\User\Desktop\kiedy_biegam_app2\app_kb\android\app\src\debug\AndroidManifest.xml:1:1-7:12
@@ -81,7 +81,7 @@ ADDED from C:\Users\User\Desktop\kiedy_biegam_app2\app_kb\android\app\src\main\A
 	android:name
 		ADDED from C:\Users\User\Desktop\kiedy_biegam_app2\app_kb\android\app\src\main\AndroidManifest.xml:4:22-76
 queries
-ADDED from C:\Users\User\Desktop\kiedy_biegam_app2\app_kb\android\app\src\main\AndroidManifest.xml:43:5-48:15
+ADDED from C:\Users\User\Desktop\kiedy_biegam_app2\app_kb\android\app\src\main\AndroidManifest.xml:43:5-54:15
 intent#action:name:android.intent.action.PROCESS_TEXT+data:mimeType:text/plain
 ADDED from C:\Users\User\Desktop\kiedy_biegam_app2\app_kb\android\app\src\main\AndroidManifest.xml:44:9-47:18
 action#android.intent.action.PROCESS_TEXT
@@ -92,6 +92,16 @@ data
 ADDED from C:\Users\User\Desktop\kiedy_biegam_app2\app_kb\android\app\src\main\AndroidManifest.xml:46:13-50
 	android:mimeType
 		ADDED from C:\Users\User\Desktop\kiedy_biegam_app2\app_kb\android\app\src\main\AndroidManifest.xml:46:19-48
+intent#action:name:android.intent.action.VIEW+category:name:android.intent.category.BROWSABLE+data:scheme:https
+ADDED from C:\Users\User\Desktop\kiedy_biegam_app2\app_kb\android\app\src\main\AndroidManifest.xml:49:9-53:18
+action#android.intent.action.VIEW
+ADDED from C:\Users\User\Desktop\kiedy_biegam_app2\app_kb\android\app\src\main\AndroidManifest.xml:50:13-64
+	android:name
+		ADDED from C:\Users\User\Desktop\kiedy_biegam_app2\app_kb\android\app\src\main\AndroidManifest.xml:50:21-62
+category#android.intent.category.BROWSABLE
+ADDED from C:\Users\User\Desktop\kiedy_biegam_app2\app_kb\android\app\src\main\AndroidManifest.xml:51:13-73
+	android:name
+		ADDED from C:\Users\User\Desktop\kiedy_biegam_app2\app_kb\android\app\src\main\AndroidManifest.xml:51:23-71
 uses-sdk
 INJECTED from C:\Users\User\Desktop\kiedy_biegam_app2\app_kb\android\app\src\debug\AndroidManifest.xml reason: use-sdk injection requested
 INJECTED from C:\Users\User\Desktop\kiedy_biegam_app2\app_kb\android\app\src\debug\AndroidManifest.xml
