@@ -236,7 +236,7 @@ String _handlePolishCharacters(String text) {
 
             // Układ przycisków na dole
             Padding(
-              padding: const EdgeInsets.only(top: 15, bottom: 24.0),
+              padding: const EdgeInsets.only(top: 15, bottom: 15.0),
               child: Column(
                 children: [
                   Row(
@@ -248,13 +248,13 @@ String _handlePolishCharacters(String text) {
                         MaterialPageRoute(builder: (context) => const ZawodyScreen()),
                       );
                     }),
-                      const SizedBox(width: 20),
+                      const SizedBox(width: 18),
                       _buildButton(context, "Dodaj zawody", () {
                         Navigator.push(context, MaterialPageRoute(builder: (context) => const DodajZawodyScreen()));
                       }),
                     ],
                   ),
-                  const SizedBox(height: 20),
+                  const SizedBox(height: 10),
                   Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [

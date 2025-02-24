@@ -1,6 +1,6 @@
-# app_kb
+# Aplikacja Mój bieg
 
-A new Flutter project.
+Aplikacja Mój bieg - Lista zawodów biegowych w Polsce.
 
 ## Getting Started
 
