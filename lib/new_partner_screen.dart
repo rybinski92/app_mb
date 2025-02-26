@@ -37,7 +37,7 @@ class NewPartnerScreen extends StatelessWidget {
                 "np. 3 miesiące, pół roku, rok.\n\n"
                 "Przygotujemy indywidualną ofertę.",
                 textAlign: TextAlign.center,
-                style: TextStyle(fontSize: 18),
+                style: TextStyle(fontSize: 16),
               ),
               const SizedBox(height: 30),
 
@@ -51,7 +51,7 @@ class NewPartnerScreen extends StatelessWidget {
                     const SizedBox(width: 10),
                     const Text(
                       "adam.mojbieg@gmail.com",
-                      style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                      style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
                     ),
                   ],
                 ),
@@ -67,7 +67,7 @@ class NewPartnerScreen extends StatelessWidget {
                 onPressed: () => Navigator.pop(context),
                 child: const Text(
                   "Powrót",
-                  style: TextStyle(fontSize: 18, color: Colors.white),
+                  style: TextStyle(fontSize: 16, color: Colors.white),
                 ),
               ),
             ],

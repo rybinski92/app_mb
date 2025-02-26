@@ -162,7 +162,7 @@ class _DodajZawodyScreenState extends State<DodajZawodyScreen> {
       onPressed: () => _sendToAppSheet(),
       child: const Text(
         'Zapisz',
-        style: TextStyle(fontSize: 16),
+        style: TextStyle(fontSize: 15),
       ),
     );
   }
