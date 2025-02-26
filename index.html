@@ -137,13 +137,12 @@
 
   <script>
     document.addEventListener('wheel', function(event) {
-      // Jeśli jest wciśnięty Ctrl, zachowaj domyślne powiększanie
-      if (event.ctrlKey) {
-        return;
-      }
-      event.preventDefault();
-    }, { passive: false });
+        if (event.ctrlKey) {
+            event.stopPropagation();
+        }
+    }, true);
   </script>
+
 
 
 </body></html>

@@ -11,11 +11,9 @@ import 'dart:convert';
 import 'config.dart';
 
 
-
 void main()  {
   runApp(const MyApp());
 }
-
 
 
 
@@ -25,7 +23,7 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Mój Bieg',
+      title: 'Mój bieg',
       theme: ThemeData(
         primarySwatch: Colors.orange,
       ),

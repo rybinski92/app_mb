@@ -18,6 +18,7 @@
   <meta content="IE=Edge" http-equiv="X-UA-Compatible">
   <meta name="description" content="A new Flutter project.">
   <meta name="theme-color" content="#FFFFFF">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=yes">
 
   <!-- iOS meta tags & icons -->
   <meta name="mobile-web-app-capable" content="yes">
@@ -87,6 +88,10 @@
       bottom: 0;
       right: 0;
     }
+    html, body {
+      touch-action: manipulation;
+    }
+
   </style>
   <script id="splash-screen-script">
     function removeSplashFromWeb() {
@@ -104,6 +109,14 @@
       <img class="center" aria-hidden="true" src="splash/img/light-1x.png" alt="">
   </picture>
   <script src="flutter_bootstrap.js" async=""></script>
+
+  <script>
+    document.addEventListener('wheel', function(event) {
+        if (event.ctrlKey) {
+            event.stopPropagation();
+        }
+    }, true);
+  </script>
 
 
 </body></html>
