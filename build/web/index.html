@@ -137,11 +137,11 @@
 
   <script>
     document.addEventListener('wheel', function(event) {
+      // Jeśli jest wciśnięty Ctrl, zachowaj domyślne powiększanie
       if (event.ctrlKey) {
-        // Możesz dodać tu własną logikę, jeśli chcesz obsługiwać zoom w specyficzny sposób
         return;
       }
-      // W tym przypadku nic nie blokujemy
+      event.preventDefault();
     }, { passive: false });
   </script>
 
