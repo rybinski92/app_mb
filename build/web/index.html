@@ -117,7 +117,7 @@
       touch-action: manipulation;
     }
   </style>
-  
+
   <script id="splash-screen-script">
     function removeSplashFromWeb() {
       document.getElementById("splash")?.remove();
@@ -134,6 +134,15 @@
       <img class="center" aria-hidden="true" src="build/web/splash/img/light-1x.png" alt="">
   </picture>
   <script src="build/web/flutter_bootstrap.js" async=""></script>
+
+  <script>
+    document.addEventListener('wheel', function(event) {
+      if (event.ctrlKey) {
+        return;
+      }
+      event.preventDefault();
+    }, { passive: false });
+  </script>
 
 
 </body></html>
