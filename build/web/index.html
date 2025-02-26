@@ -138,9 +138,10 @@
   <script>
     document.addEventListener('wheel', function(event) {
       if (event.ctrlKey) {
+        // Możesz dodać tu własną logikę, jeśli chcesz obsługiwać zoom w specyficzny sposób
         return;
       }
-      event.preventDefault();
+      // W tym przypadku nic nie blokujemy
     }, { passive: false });
   </script>
 
