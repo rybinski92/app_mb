@@ -15,16 +15,18 @@ class _ZawodyScreenState extends State<ZawodyScreen> {
   List<Map<String, String>> zawody = [];
   List<String> wojewodztwa = [];
   List<String> miesiace = [];
-  String? wybraneWojewodztwo;
+  // String? wybraneWojewodztwo;
+  List<String> wybraneWojewodztwa = ["Wszystkie województwa"];
   String wybranyMiesiac = "Cały rok";
   String wybranyRok = "2025";
   String? wybranyTypZawodow = "Wszystkie zawody"; // Dodany filtr na typ zawodów
 
-  bool _pokazFiltry = true; // <-- Nowa zmienna do sterowania widocznością filtrów
+  bool _pokazFiltry =
+      true; // <-- Nowa zmienna do sterowania widocznością filtrów
 
-  final String apiUrl = "https://api.appsheet.com/api/v2/apps/566e1354-d7f1-49a1-bb85-6ce2f26ce8b4/tables/zawody/records";
+  final String apiUrl =
+      "https://api.appsheet.com/api/v2/apps/566e1354-d7f1-49a1-bb85-6ce2f26ce8b4/tables/zawody/records";
   final String apiKey = Config.apiKey3;
-  
 
   final Map<String, int> miesiaceKolejnosc = {
     "styczeń": 1,
@@ -58,11 +60,11 @@ class _ZawodyScreenState extends State<ZawodyScreen> {
           "Accept": "application/json",
           "Content-Type": "application/json; charset=utf-8",
           "ApplicationAccessKey": apiKey,
-          // "ApplicationAccessKey": apiKey3 ?? "", 
+          // "ApplicationAccessKey": apiKey3 ?? "",
         },
         body: jsonEncode({
           "Action": "Find",
-          "Properties": { "Locale": "pl-PL" },
+          "Properties": {"Locale": "pl-PL"},
           "Rows": []
         }),
       );
@@ -77,8 +79,8 @@ class _ZawodyScreenState extends State<ZawodyScreen> {
           return;
         }
 
-      final decodedBody = utf8.decode(response.bodyBytes);
-      final List<dynamic> data = json.decode(decodedBody);
+        final decodedBody = utf8.decode(response.bodyBytes);
+        final List<dynamic> data = json.decode(decodedBody);
 
         final wojewodztwaSet = <String>{"Wszystkie województwa"};
         final miesiaceSet = <String>{"Cały rok"};
@@ -90,7 +92,8 @@ class _ZawodyScreenState extends State<ZawodyScreen> {
             final miesiac = zawod["miesiac"] ?? zawod["Miesiac"] ?? "";
             final rok = zawod["rok"] ?? zawod["Rok"] ?? "";
             final miejsce = zawod["miejsce"] ?? zawod["Miejsce"] ?? "";
-            final wojewodztwo = zawod["wojewodztwo"] ?? zawod["Wojewodztwo"] ?? "";
+            final wojewodztwo =
+                zawod["wojewodztwo"] ?? zawod["Wojewodztwo"] ?? "";
             final dystanse = zawod["dystans"] ?? zawod["Dystans"] ?? "";
             final gorskie = zawod["gorskie"] ?? zawod["Gorskie"] ?? "0";
 
@@ -110,32 +113,33 @@ class _ZawodyScreenState extends State<ZawodyScreen> {
           }).toList();
 
           final List<String> poprawnaKolejnoscWojewodztw = [
-            "DOLNOŚLĄSKIE",  
-            "KUJAWSKO-POMORSKIE" , 
-            "LUBELSKIE",  
-            "LUBUSKIE",  
-            "ŁÓDZKIE" , 
-            "MAŁOPOLSKIE" , 
-            "MAZOWIECKIE",  
-            "OPOLSKIE"  ,
-            "PODKARPACKIE" , 
-            "PODLASKIE"  ,
-            "POMORSKIE" , 
-            "ŚLĄSKIE" , 
-            "ŚWIĘTOKRZYSKIE" , 
-            "WARMIŃSKO-MAZURSKIE" ,
-            "WIELKOPOLSKIE" , 
+            "DOLNOŚLĄSKIE",
+            "KUJAWSKO-POMORSKIE",
+            "LUBELSKIE",
+            "LUBUSKIE",
+            "ŁÓDZKIE",
+            "MAŁOPOLSKIE",
+            "MAZOWIECKIE",
+            "OPOLSKIE",
+            "PODKARPACKIE",
+            "PODLASKIE",
+            "POMORSKIE",
+            "ŚLĄSKIE",
+            "ŚWIĘTOKRZYSKIE",
+            "WARMIŃSKO-MAZURSKIE",
+            "WIELKOPOLSKIE",
             "ZACHODNIOPOMORSKIE"
           ];
 
           setState(() {
             // Sortowanie miesięcy wg poprawnej kolejności
             miesiace = miesiaceSet.toList();
-            miesiace.sort((a, b) => (miesiaceKolejnosc[a] ?? 99).compareTo(miesiaceKolejnosc[b] ?? 99));
+            miesiace.sort((a, b) => (miesiaceKolejnosc[a] ?? 99)
+                .compareTo(miesiaceKolejnosc[b] ?? 99));
 
             // Pobranie listy województw
             wojewodztwa = wojewodztwaSet.toList();
-            
+
             // Usunięcie "Wszystkie województwa" przed sortowaniem
             wojewodztwa.remove("Wszystkie województwa");
 
@@ -144,7 +148,8 @@ class _ZawodyScreenState extends State<ZawodyScreen> {
               final indexA = poprawnaKolejnoscWojewodztw.indexOf(a);
               final indexB = poprawnaKolejnoscWojewodztw.indexOf(b);
 
-              if (indexA == -1) return 1; // Jeśli województwo nie jest w liście, daj na koniec
+              if (indexA == -1)
+                return 1; // Jeśli województwo nie jest w liście, daj na koniec
               if (indexB == -1) return -1;
               return indexA.compareTo(indexB);
             });
@@ -156,7 +161,8 @@ class _ZawodyScreenState extends State<ZawodyScreen> {
 
         print("✅ Pobrano ${zawody.length} zawodów!");
       } else {
-        print("❌ Błąd pobierania danych: ${response.statusCode} - ${response.body}");
+        print(
+            "❌ Błąd pobierania danych: ${response.statusCode} - ${response.body}");
       }
     } catch (e) {
       print("❌ Błąd połączenia: $e");
@@ -181,11 +187,11 @@ class _ZawodyScreenState extends State<ZawodyScreen> {
 
   List<Map<String, String>> _filtrujZawody() {
     return zawody.where((z) {
-      final wojFilter = wybraneWojewodztwo == null ||
-          wybraneWojewodztwo == "Wszystkie województwa" ||
-          wybraneWojewodztwo == z["wojewodztwo"];
+      final wojFilter = wybraneWojewodztwa.contains("Wszystkie województwa") ||
+          wybraneWojewodztwa.contains(z["wojewodztwo"]);
 
-      final miesiacFilter = wybranyMiesiac == "Cały rok" || wybranyMiesiac == z["miesiac"];
+      final miesiacFilter =
+          wybranyMiesiac == "Cały rok" || wybranyMiesiac == z["miesiac"];
       final rokFilter = wybranyRok == z["rok"];
       final gorskieFilter = wybranyTypZawodow == "Wszystkie zawody" ||
           (wybranyTypZawodow == "Górskie zawody" && z["gorskie"] == "1");
@@ -202,6 +208,66 @@ class _ZawodyScreenState extends State<ZawodyScreen> {
     } else {
       throw 'Nie można otworzyć URL: $url';
     }
+  }
+
+  void _wybierzWojewodztwa() async {
+    List<String> tempWybrane = List.from(wybraneWojewodztwa);
+
+    await showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text("Wybierz województwa"),
+          content: SizedBox(
+            width: 400, // ✅ SZEROKIE OKNO, żeby nazwy się mieściły
+            child: SingleChildScrollView(
+              child: Column(
+                children: wojewodztwa.map((woj) {
+                  return CheckboxListTile(
+                    title: Text(woj),
+                    value: tempWybrane.contains(woj),
+                    onChanged: (bool? value) {
+                      setState(() {
+                        if (woj == "Wszystkie województwa") {
+                          tempWybrane.clear();
+                          if (value == true) {
+                            tempWybrane.add("Wszystkie województwa");
+                          }
+                        } else {
+                          tempWybrane.remove("Wszystkie województwa");
+                          if (value == true) {
+                            tempWybrane.add(woj);
+                          } else {
+                            tempWybrane.remove(woj);
+                          }
+                        }
+                      });
+                    },
+                  );
+                }).toList(),
+              ),
+            ),
+          ),
+          actions: [
+            TextButton(
+              onPressed: () {
+                setState(() {
+                  if (tempWybrane.contains("Wszystkie województwa") && tempWybrane.length > 1) {
+                    tempWybrane.remove("Wszystkie województwa");
+                  } else if (tempWybrane.isEmpty) {
+                    tempWybrane.add("Wszystkie województwa");
+                  }
+                  wybraneWojewodztwa = List.from(tempWybrane);
+                });
+                Navigator.of(context).pop();
+              },
+              child: const Text("OK"),
+            ),
+          ],
+        );
+      },
+    );
+
   }
 
   @override
@@ -237,112 +303,109 @@ class _ZawodyScreenState extends State<ZawodyScreen> {
           child: Column(
             children: [
               if (_pokazFiltry) // Pokazujemy filtry tylko, jeśli _pokazFiltry == true
-              Padding(
-                padding: const EdgeInsets.all(8.0),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    DropdownButtonFormField<String>(
-                      decoration: const InputDecoration(
-                          labelText: "Wybierz województwo"),
-                      value: wybraneWojewodztwo,
-                      items: wojewodztwa.map((woj) {
-                        return DropdownMenuItem(
-                          value: woj,
-                          child: Text(woj),
-                        );
-                      }).toList(),
-                      onChanged: (value) {
-                        setState(() {
-                          wybraneWojewodztwo = value;
-                        });
-                      },
-                    ),
-                    const SizedBox(height: 10),
-                    Row(
-                      children: [
-                        Expanded(
-                          child: DropdownButtonFormField<String>(
-                            decoration: const InputDecoration(
-                                labelText: "Wybierz miesiąc"),
-                            value: wybranyMiesiac,
-                            items: miesiace.map((mies) {
-                              return DropdownMenuItem(
-                                value: mies,
-                                child: Text(mies),
-                              );
-                            }).toList(),
-                            onChanged: (value) {
-                              setState(() {
-                                wybranyMiesiac = value!;
-                              });
-                            },
+                Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      TextFormField(
+                        readOnly: true,
+                        decoration: InputDecoration(
+                          labelText: "Wybierz województwa",
+                          suffixIcon: const Icon(Icons.arrow_drop_down),
+                        ),
+                        controller: TextEditingController(
+                          text: wybraneWojewodztwa.join(", "),
+                        ),
+                        onTap: _wybierzWojewodztwa,
+                      ),
+                      const SizedBox(height: 10),
+                      Row(
+                        children: [
+                          Expanded(
+                            child: DropdownButtonFormField<String>(
+                              decoration: const InputDecoration(
+                                  labelText: "Wybierz miesiąc"),
+                              value: wybranyMiesiac,
+                              items: miesiace.map((mies) {
+                                return DropdownMenuItem(
+                                  value: mies,
+                                  child: Text(mies),
+                                );
+                              }).toList(),
+                              onChanged: (value) {
+                                setState(() {
+                                  wybranyMiesiac = value!;
+                                });
+                              },
+                            ),
                           ),
-                        ),
-                        const SizedBox(width: 10),
-                        Expanded(
-                          child: DropdownButtonFormField<String>(
-                            decoration:
-                                const InputDecoration(labelText: "Wybierz rok"),
-                            value: wybranyRok,
-                            items: ["2025", "2026"].map((rok) {
-                              return DropdownMenuItem(
-                                value: rok,
-                                child: Text(rok),
-                              );
-                            }).toList(),
-                            onChanged: (value) {
-                              setState(() {
-                                wybranyRok = value!;
-                              });
-                            },
+                          const SizedBox(width: 10),
+                          Expanded(
+                            child: DropdownButtonFormField<String>(
+                              decoration: const InputDecoration(
+                                  labelText: "Wybierz rok"),
+                              value: wybranyRok,
+                              items: ["2025", "2026"].map((rok) {
+                                return DropdownMenuItem(
+                                  value: rok,
+                                  child: Text(rok),
+                                );
+                              }).toList(),
+                              onChanged: (value) {
+                                setState(() {
+                                  wybranyRok = value!;
+                                });
+                              },
+                            ),
                           ),
-                        ),
-                      ],
-                    ),
-                    const SizedBox(height: 10),
-                    DropdownButtonFormField<String>(
-                      decoration:
-                          const InputDecoration(labelText: "Typ zawodów"),
-                      value: wybranyTypZawodow,
-                      items: ["Wszystkie zawody", "Górskie zawody"].map((typ) {
-                        return DropdownMenuItem(
-                          value: typ,
-                          child: Text(typ),
-                        );
-                      }).toList(),
-                      onChanged: (value) {
-                        setState(() {
-                          wybranyTypZawodow = value;
-                        });
-                      },
-                    ),
-                    const SizedBox(height: 4),
-                    // Zielony kwadrat obok tekstu jak legenda
-                    Row(
-                      children: [
-                        Container(
-                          width: 14,
-                          height: 14,
-                          color: Colors.green[300],
-                        ),
-                        const SizedBox(width: 6),
-                        const Text(
-                          "Zawody górskie punktowane w serwisie RMT.",
-                          style: TextStyle(fontSize: 12, fontStyle: FontStyle.italic),
-                        ),
-                      ],
-                    ),
-                    const SizedBox(height: 2),
-                    // Drugi tekst w kursywie
-                    Text(
-                      "Kliknięcie w zawody -> wyszukiwarka Google.",
-                      style:
-                          TextStyle(fontSize: 12, fontStyle: FontStyle.italic),
-                    ),
-                  ],
+                        ],
+                      ),
+                      const SizedBox(height: 10),
+                      DropdownButtonFormField<String>(
+                        decoration:
+                            const InputDecoration(labelText: "Typ zawodów"),
+                        value: wybranyTypZawodow,
+                        items:
+                            ["Wszystkie zawody", "Górskie zawody"].map((typ) {
+                          return DropdownMenuItem(
+                            value: typ,
+                            child: Text(typ),
+                          );
+                        }).toList(),
+                        onChanged: (value) {
+                          setState(() {
+                            wybranyTypZawodow = value;
+                          });
+                        },
+                      ),
+                      const SizedBox(height: 4),
+                      // Zielony kwadrat obok tekstu jak legenda
+                      Row(
+                        children: [
+                          Container(
+                            width: 14,
+                            height: 14,
+                            color: Colors.green[300],
+                          ),
+                          const SizedBox(width: 6),
+                          const Text(
+                            "Zawody górskie punktowane w serwisie RMT.",
+                            style: TextStyle(
+                                fontSize: 12, fontStyle: FontStyle.italic),
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: 2),
+                      // Drugi tekst w kursywie
+                      Text(
+                        "Kliknięcie w zawody -> wyszukiwarka Google.",
+                        style: TextStyle(
+                            fontSize: 12, fontStyle: FontStyle.italic),
+                      ),
+                    ],
+                  ),
                 ),
-              ),
               Expanded(
                 child: ListView.builder(
                   itemCount: filtrowaneZawody.length,
