@@ -211,59 +211,65 @@ class _ZawodyScreenState extends State<ZawodyScreen> {
   }
 
   void _wybierzWojewodztwa() async {
-    List<String> tempWybrane = List.from(wybraneWojewodztwa);
+    // List<String> tempWybrane = List.from(wybraneWojewodztwa);
 
     await showDialog(
       context: context,
       builder: (BuildContext context) {
-        return AlertDialog(
-          title: const Text("Wybierz województwa"),
-          content: SizedBox(
-            width: 400, // ✅ SZEROKIE OKNO, żeby nazwy się mieściły
-            child: SingleChildScrollView(
-              child: Column(
-                children: wojewodztwa.map((woj) {
-                  return CheckboxListTile(
-                    title: Text(woj),
-                    value: tempWybrane.contains(woj),
-                    onChanged: (bool? value) {
-                      setState(() {
-                        if (woj == "Wszystkie województwa") {
-                          tempWybrane.clear();
-                          if (value == true) {
-                            tempWybrane.add("Wszystkie województwa");
-                          }
-                        } else {
-                          tempWybrane.remove("Wszystkie województwa");
-                          if (value == true) {
-                            tempWybrane.add(woj);
-                          } else {
-                            tempWybrane.remove(woj);
-                          }
-                        }
-                      });
-                    },
-                  );
-                }).toList(),
+        List<String> tempWybrane = List.from(wybraneWojewodztwa); // Kopia dla dialogu
+
+        return StatefulBuilder( // ✅ Kluczowy element do dynamicznej aktualizacji
+          builder: (context, setDialogState) {
+            return AlertDialog(
+              title: const Text("Wybierz województwa"),
+              content: SizedBox(
+                width: 400, // ✅ SZEROKIE OKNO
+                child: SingleChildScrollView(
+                  child: Column(
+                    children: wojewodztwa.map((woj) {
+                      return CheckboxListTile(
+                        title: Text(woj),
+                        value: tempWybrane.contains(woj),
+                        onChanged: (bool? value) {
+                          setDialogState(() { // ✅ Aktualizacja dynamiczna w dialogu
+                            if (woj == "Wszystkie województwa") {
+                              tempWybrane.clear();
+                              if (value == true) {
+                                tempWybrane.add("Wszystkie województwa");
+                              }
+                            } else {
+                              tempWybrane.remove("Wszystkie województwa");
+                              if (value == true) {
+                                tempWybrane.add(woj);
+                              } else {
+                                tempWybrane.remove(woj);
+                              }
+                            }
+                          });
+                        },
+                      );
+                    }).toList(),
+                  ),
+                ),
               ),
-            ),
-          ),
-          actions: [
-            TextButton(
-              onPressed: () {
-                setState(() {
-                  if (tempWybrane.contains("Wszystkie województwa") && tempWybrane.length > 1) {
-                    tempWybrane.remove("Wszystkie województwa");
-                  } else if (tempWybrane.isEmpty) {
-                    tempWybrane.add("Wszystkie województwa");
-                  }
-                  wybraneWojewodztwa = List.from(tempWybrane);
-                });
-                Navigator.of(context).pop();
-              },
-              child: const Text("OK"),
-            ),
-          ],
+              actions: [
+                TextButton(
+                  onPressed: () {
+                    setState(() { // ✅ Aktualizacja globalna po zamknięciu dialogu
+                      if (tempWybrane.contains("Wszystkie województwa") && tempWybrane.length > 1) {
+                        tempWybrane.remove("Wszystkie województwa");
+                      } else if (tempWybrane.isEmpty) {
+                        tempWybrane.add("Wszystkie województwa");
+                      }
+                      wybraneWojewodztwa = List.from(tempWybrane);
+                    });
+                    Navigator.of(context).pop();
+                  },
+                  child: const Text("OK"),
+                ),
+              ],
+            );
+          },
         );
       },
     );
