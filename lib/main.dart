@@ -15,15 +15,13 @@ void main()  {
   runApp(const MyApp());
 }
 
-
-
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
 
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Mój bieg',
+      title: 'Mój Bieg',
       theme: ThemeData(
         primarySwatch: Colors.orange,
       ),
@@ -213,7 +211,7 @@ String _handlePolishCharacters(String text) {
                     MaterialPageRoute(builder: (context) => const RecommendedZawodyScreen()),
                   );
                 },
-                child: const Text("Polecane zawody", style: TextStyle(fontSize: 14)),
+                child: const Text("Polecane zawody", style: TextStyle(fontSize: 15)),
               ),
             ),
 
@@ -250,7 +248,7 @@ String _handlePolishCharacters(String text) {
                         MaterialPageRoute(builder: (context) => const ZawodyScreen()),
                       );
                     }),
-                      const SizedBox(width: 18),
+                      const SizedBox(width: 20),
                       _buildButton(context, "Dodaj zawody", () {
                         Navigator.push(context, MaterialPageRoute(builder: (context) => const DodajZawodyScreen()));
                       }),
@@ -291,7 +289,7 @@ String _handlePolishCharacters(String text) {
         padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
       ),
       onPressed: onPressed,
-      child: Text(text, style: const TextStyle(fontSize: 14)),
+      child: Text(text, style: const TextStyle(fontSize: 15)),
     );
   }
 
@@ -307,7 +305,7 @@ String _handlePolishCharacters(String text) {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text(zawod["nazwa"] ?? '', style: const TextStyle(fontSize: 14, fontWeight: FontWeight.bold)),
+              Text(zawod["nazwa"] ?? '', style: const TextStyle(fontSize: 15, fontWeight: FontWeight.bold)),
               const SizedBox(height: 5),
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,

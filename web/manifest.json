@@ -1,11 +1,11 @@
 {
-    "name": "app_kb",
-    "short_name": "app_kb",
+    "name": "Apikacja Mój bieg",
+    "short_name": "Mój bieg",
     "start_url": ".",
     "display": "standalone",
     "background_color": "#0175C2",
-    "theme_color": "#0175C2",
-    "description": "A new Flutter project.",
+    "theme_color": "#FF6600",
+    "description": "Mój bieg - aplikacja i kalendarz biegowy. Sprawdź daty zawodów, tempo biegu i trzymamy kciuki za Twoje wyniki!",
     "orientation": "portrait-primary",
     "prefer_related_applications": false,
     "icons": [
@@ -30,9 +30,6 @@
             "sizes": "512x512",
             "type": "image/png",
             "purpose": "maskable"
-        },
-        {
-            "theme_color": "#FFFFFF"
         }
     ]
 }

@@ -18,8 +18,9 @@ class _ZawodyScreenState extends State<ZawodyScreen> {
   // String? wybraneWojewodztwo;
   List<String> wybraneWojewodztwa = ["Wszystkie województwa"];
   String wybranyMiesiac = "Cały rok";
-  String wybranyRok = "2025";
-  String? wybranyTypZawodow = "Wszystkie zawody"; // Dodany filtr na typ zawodów
+  // String wybranyRok = "2025";
+  String? wybranyTypZawodow = "Wszystkie"; // Dodany filtr na typ zawodów
+  Set<String> wybraneDystanse = {}; // Brak domyślnego dystansu
 
   bool _pokazFiltry =
       true; // <-- Nowa zmienna do sterowania widocznością filtrów
@@ -27,6 +28,15 @@ class _ZawodyScreenState extends State<ZawodyScreen> {
   final String apiUrl =
       "https://api.appsheet.com/api/v2/apps/566e1354-d7f1-49a1-bb85-6ce2f26ce8b4/tables/zawody/records";
   final String apiKey = Config.apiKey3;
+
+  final List<String> dystanseOpcje = [
+    "< 5 km",
+    "5 km",
+    "10 km",
+    "21.097 km",
+    "42.195 km",
+    "> 42.195 km"
+  ]; // Opcje dla filtra dystansu
 
   final Map<String, int> miesiaceKolejnosc = {
     "styczeń": 1,
@@ -185,6 +195,47 @@ class _ZawodyScreenState extends State<ZawodyScreen> {
     return rawDate;
   }
 
+  /// Funkcja filtrująca dystanse
+  bool _pasujeDystans(String? dystanse) {
+    if (wybraneDystanse.isEmpty)
+      return true; // Jeśli nic nie wybrano -> pokazuje wszystko
+    if (dystanse == null || dystanse.isEmpty) return false;
+
+    List<String> dystanseLista =
+        dystanse.split(',').map((e) => e.trim()).toList();
+
+    for (var dystans in dystanseLista) {
+      try {
+        double dystansValue = double.parse(dystans.split(' ')[0]);
+
+        for (var wybrany in wybraneDystanse) {
+          switch (wybrany) {
+            case "< 5 km":
+              if (dystansValue < 5) return true;
+              break;
+            case "5 km":
+              if (dystansValue == 5) return true;
+              break;
+            case "10 km":
+              if (dystansValue == 10) return true;
+              break;
+            case "21.097 km":
+              if (dystansValue == 21.097) return true;
+              break;
+            case "42.195 km":
+              if (dystansValue == 42.195) return true;
+              break;
+            case "> 42.195 km":
+              if (dystansValue > 42.195) return true;
+              break;
+          }
+        }
+      } catch (_) {}
+    }
+
+    return false;
+  }
+
   List<Map<String, String>> _filtrujZawody() {
     return zawody.where((z) {
       final wojFilter = wybraneWojewodztwa.contains("Wszystkie województwa") ||
@@ -192,11 +243,12 @@ class _ZawodyScreenState extends State<ZawodyScreen> {
 
       final miesiacFilter =
           wybranyMiesiac == "Cały rok" || wybranyMiesiac == z["miesiac"];
-      final rokFilter = wybranyRok == z["rok"];
-      final gorskieFilter = wybranyTypZawodow == "Wszystkie zawody" ||
-          (wybranyTypZawodow == "Górskie zawody" && z["gorskie"] == "1");
+      // final rokFilter = wybranyRok == z["rok"];
+      final gorskieFilter = wybranyTypZawodow == "Wszystkie" ||
+          (wybranyTypZawodow == "Górskie" && z["gorskie"] == "1");
+      final dystansFilter = _pasujeDystans(z["dystanse"]);
 
-      return wojFilter && miesiacFilter && rokFilter && gorskieFilter;
+      return wojFilter && miesiacFilter && gorskieFilter && dystansFilter;
     }).toList();
   }
 
@@ -216,9 +268,11 @@ class _ZawodyScreenState extends State<ZawodyScreen> {
     await showDialog(
       context: context,
       builder: (BuildContext context) {
-        List<String> tempWybrane = List.from(wybraneWojewodztwa); // Kopia dla dialogu
+        List<String> tempWybrane =
+            List.from(wybraneWojewodztwa); // Kopia dla dialogu
 
-        return StatefulBuilder( // ✅ Kluczowy element do dynamicznej aktualizacji
+        return StatefulBuilder(
+          // ✅ Kluczowy element do dynamicznej aktualizacji
           builder: (context, setDialogState) {
             return AlertDialog(
               title: const Text("Wybierz województwa"),
@@ -231,7 +285,8 @@ class _ZawodyScreenState extends State<ZawodyScreen> {
                         title: Text(woj),
                         value: tempWybrane.contains(woj),
                         onChanged: (bool? value) {
-                          setDialogState(() { // ✅ Aktualizacja dynamiczna w dialogu
+                          setDialogState(() {
+                            // ✅ Aktualizacja dynamiczna w dialogu
                             if (woj == "Wszystkie województwa") {
                               tempWybrane.clear();
                               if (value == true) {
@@ -255,8 +310,10 @@ class _ZawodyScreenState extends State<ZawodyScreen> {
               actions: [
                 TextButton(
                   onPressed: () {
-                    setState(() { // ✅ Aktualizacja globalna po zamknięciu dialogu
-                      if (tempWybrane.contains("Wszystkie województwa") && tempWybrane.length > 1) {
+                    setState(() {
+                      // ✅ Aktualizacja globalna po zamknięciu dialogu
+                      if (tempWybrane.contains("Wszystkie województwa") &&
+                          tempWybrane.length > 1) {
                         tempWybrane.remove("Wszystkie województwa");
                       } else if (tempWybrane.isEmpty) {
                         tempWybrane.add("Wszystkie województwa");
@@ -273,7 +330,6 @@ class _ZawodyScreenState extends State<ZawodyScreen> {
         );
       },
     );
-
   }
 
   @override
@@ -350,17 +406,18 @@ class _ZawodyScreenState extends State<ZawodyScreen> {
                           Expanded(
                             child: DropdownButtonFormField<String>(
                               decoration: const InputDecoration(
-                                  labelText: "Wybierz rok"),
-                              value: wybranyRok,
-                              items: ["2025", "2026"].map((rok) {
+                                  labelText: "Typ zawodów"),
+                              value: wybranyTypZawodow,
+                              items: ["Wszystkie", "Górskie"]
+                                  .map((typ) {
                                 return DropdownMenuItem(
-                                  value: rok,
-                                  child: Text(rok),
+                                  value: typ,
+                                  child: Text(typ),
                                 );
                               }).toList(),
                               onChanged: (value) {
                                 setState(() {
-                                  wybranyRok = value!;
+                                  wybranyTypZawodow = value;
                                 });
                               },
                             ),
@@ -368,23 +425,25 @@ class _ZawodyScreenState extends State<ZawodyScreen> {
                         ],
                       ),
                       const SizedBox(height: 10),
-                      DropdownButtonFormField<String>(
-                        decoration:
-                            const InputDecoration(labelText: "Typ zawodów"),
-                        value: wybranyTypZawodow,
-                        items:
-                            ["Wszystkie zawody", "Górskie zawody"].map((typ) {
-                          return DropdownMenuItem(
-                            value: typ,
-                            child: Text(typ),
+                      // Filtr dystansów
+                      Wrap(
+                        children: dystanseOpcje.map((dystans) {
+                          return FilterChip(
+                            label: Text(dystans),
+                            selected: wybraneDystanse.contains(dystans),
+                            onSelected: (isSelected) {
+                              setState(() {
+                                if (isSelected) {
+                                  wybraneDystanse.add(dystans);
+                                } else {
+                                  wybraneDystanse.remove(dystans);
+                                }
+                              });
+                            },
                           );
                         }).toList(),
-                        onChanged: (value) {
-                          setState(() {
-                            wybranyTypZawodow = value;
-                          });
-                        },
                       ),
+
                       const SizedBox(height: 4),
                       // Zielony kwadrat obok tekstu jak legenda
                       Row(

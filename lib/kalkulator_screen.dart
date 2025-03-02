@@ -113,11 +113,11 @@ class _KalkulatorScreenState extends State<KalkulatorScreen> {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         const Text("Tempo biegu",
-            style: TextStyle(fontSize: 19, fontWeight: FontWeight.bold)),
+            style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
         _poleWybieraniaDystansu(),
         if (_wybranyDystans == "-") _poleWprowadzaniaDystansu(),
         _poleCzasu(),
-        const SizedBox(height: 7), // Delikatny odstęp przed przyciskiem
+        const SizedBox(height: 7),
         _przyciskOblicz(_obliczTempo),
         _wynik("Tempo biegu: $_wynikTempo"),
       ],
@@ -129,12 +129,12 @@ class _KalkulatorScreenState extends State<KalkulatorScreen> {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         const Text("Czas odcinka",
-            style: TextStyle(fontSize: 19, fontWeight: FontWeight.bold)),
+            style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
         _poleWprowadzania("Planowane tempo biegu:", _tempoMinController, "min",
             _tempoSecController, "s"),
         _poleWprowadzania("Dystans:", _odcinekKmController, "km",
             _odcinekMController, "m"),
-        const SizedBox(height: 7), // Delikatny odstęp przed przyciskiem
+        const SizedBox(height: 7),
         _przyciskOblicz(_obliczCzasOdcinka),
         _wynik("Czas odcinka: $_wynikCzasOdcinka"),
       ],
@@ -146,7 +146,7 @@ class _KalkulatorScreenState extends State<KalkulatorScreen> {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         const Text("Wybierz dystans",
-            style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold)),
+            style: TextStyle(fontSize: 15, fontWeight: FontWeight.bold)),
         const SizedBox(height: 4),
         DropdownButtonFormField<String>(
           value: _wybranyDystans,
@@ -189,7 +189,7 @@ class _KalkulatorScreenState extends State<KalkulatorScreen> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(label, style: const TextStyle(fontSize: 14, fontWeight: FontWeight.bold)),
+        Text(label, style: const TextStyle(fontSize: 15, fontWeight: FontWeight.bold)),
         Row(children: [
           _input(ctrl1, lbl1),
           const SizedBox(width: 8),
@@ -216,12 +216,12 @@ class _KalkulatorScreenState extends State<KalkulatorScreen> {
       child: ElevatedButton(
         style: ElevatedButton.styleFrom(backgroundColor: Colors.orange, foregroundColor: Colors.white),
         onPressed: onPressed,
-        child: const Text("OBLICZ", style: TextStyle(fontSize: 15)),
+        child: const Text("OBLICZ", style: TextStyle(fontSize: 16)),
       ),
     );
   }
 
   Widget _wynik(String text) => Center(
-        child: Text(text, style: const TextStyle(fontSize: 19, fontWeight: FontWeight.bold)),
+        child: Text(text, style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
       );
 }
