@@ -40512,7 +40512,7 @@ s.r.jN(0,B.l_)},
 $S:0}
 A.LA.prototype={
 H(a){var s=null
-return new A.zx(B.G0,"M\xf3j Bieg",A.uQ(s,s,B.aw,s),!1,s)}}
+return new A.zx(B.G0,"M\xf3j bieg",A.uQ(s,s,B.aw,s),!1,s)}}
 A.yN.prototype={
 a8(){return new A.Sf(A.b([],t.m0))}}
 A.Sf.prototype={
@@ -40782,7 +40782,7 @@ return null},
 $S:0}
 A.qL.prototype={
 a8(){var s=t.s,r=t.N
-return new A.Gy(A.b([],t.m0),A.b([],s),A.b([],s),A.b(["Wszystkie wojew\xf3dztwa"],s),A.av(r),A.b(["< 5 km","5 km","10 km","21.097 km","42.195 km","> 42.195 km"],s),A.aj(["stycze\u0144",1,"luty",2,"marzec",3,"kwiecie\u0144",4,"maj",5,"czerwiec",6,"lipiec",7,"sierpie\u0144",8,"wrzesie\u0144",9,"pa\u017adziernik",10,"listopad",11,"grudzie\u0144",12],r,t.S))}}
+return new A.Gy(A.b([],t.m0),A.b([],s),A.b([],s),A.b(["Wszystkie wojew\xf3dztwa"],s),A.av(r),A.b(["< 5 km","5 km","10 km","21 km","42 km","Ultra"],s),A.aj(["stycze\u0144",1,"luty",2,"marzec",3,"kwiecie\u0144",4,"maj",5,"czerwiec",6,"lipiec",7,"sierpie\u0144",8,"wrzesie\u0144",9,"pa\u017adziernik",10,"listopad",11,"grudzie\u0144",12],r,t.S))}}
 A.Gy.prototype={
 av(){this.aJ()
 this.xV()},
