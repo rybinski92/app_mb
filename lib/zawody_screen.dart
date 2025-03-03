@@ -33,9 +33,9 @@ class _ZawodyScreenState extends State<ZawodyScreen> {
     "< 5 km",
     "5 km",
     "10 km",
-    "21.097 km",
-    "42.195 km",
-    "> 42.195 km"
+    "21 km",
+    "42 km",
+    "Ultra"
   ]; // Opcje dla filtra dystansu
 
   final Map<String, int> miesiaceKolejnosc = {
@@ -214,18 +214,21 @@ class _ZawodyScreenState extends State<ZawodyScreen> {
               if (dystansValue < 5) return true;
               break;
             case "5 km":
-              if (dystansValue == 5) return true;
+              if (dystansValue == 5 || (dystansValue > 5 && dystansValue < 6)) return true;
               break;
             case "10 km":
-              if (dystansValue == 10) return true;
+              if (dystansValue == 10 || (dystansValue > 10 && dystansValue < 11)) return true;
               break;
-            case "21.097 km":
-              if (dystansValue == 21.097) return true;
+            case "21 km":
+              if (dystansValue == 21 || (dystansValue > 21 && dystansValue < 22)) return true;
+              // if (dystansValue == 21.097) return true;
               break;
-            case "42.195 km":
-              if (dystansValue == 42.195) return true;
+            case "42 km":
+              if (dystansValue == 42 || (dystansValue > 42 && dystansValue < 43)) return true;
+              // if (dystansValue == 42.195) return true;
               break;
-            case "> 42.195 km":
+            // case "> 42.195 km":
+            case "Ultra":
               if (dystansValue > 42.195) return true;
               break;
           }

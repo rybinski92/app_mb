@@ -40838,15 +40838,23 @@ for(k=new A.k6(h,h.r,m),k.c=h.e;k.A();){j=k.d
 q=j==null?n.a(j):j
 switch(q){case"< 5 km":if(r<5)return!0
 break
-case"5 km":if(J.c(r,5))return!0
+case"5 km":if(!J.c(r,5))j=r>5&&r<6
+else j=!0
+if(j)return!0
 break
-case"10 km":if(J.c(r,10))return!0
+case"10 km":if(!J.c(r,10))j=r>10&&r<11
+else j=!0
+if(j)return!0
 break
-case"21.097 km":if(J.c(r,21.097))return!0
+case"21 km":if(!J.c(r,21))j=r>21&&r<22
+else j=!0
+if(j)return!0
 break
-case"42.195 km":if(J.c(r,42.195))return!0
+case"42 km":if(!J.c(r,42))j=r>42&&r<43
+else j=!0
+if(j)return!0
 break
-case"> 42.195 km":if(r>42.195)return!0
+case"Ultra":if(r>42.195)return!0
 break}}}catch(i){}}return!1},
 a6S(){var s=this.d,r=A.Z(s).i("aN<1>")
 return A.a2(new A.aN(s,new A.arr(this),r),!0,r.i("m.E"))},
