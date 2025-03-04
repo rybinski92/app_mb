@@ -214,17 +214,21 @@ class _ZawodyScreenState extends State<ZawodyScreen> {
               if (dystansValue < 5) return true;
               break;
             case "5 km":
-              if (dystansValue == 5 || (dystansValue > 5 && dystansValue < 6)) return true;
+              if (dystansValue == 5 || (dystansValue > 5 && dystansValue < 6))
+                return true;
               break;
             case "10 km":
-              if (dystansValue == 10 || (dystansValue > 10 && dystansValue < 11)) return true;
+              if (dystansValue == 10 ||
+                  (dystansValue > 10 && dystansValue < 11)) return true;
               break;
             case "21 km":
-              if (dystansValue == 21 || (dystansValue > 21 && dystansValue < 22)) return true;
+              if (dystansValue == 21 ||
+                  (dystansValue > 21 && dystansValue < 22)) return true;
               // if (dystansValue == 21.097) return true;
               break;
             case "42 km":
-              if (dystansValue == 42 || (dystansValue > 42 && dystansValue < 43)) return true;
+              if (dystansValue == 42 ||
+                  (dystansValue > 42 && dystansValue < 43)) return true;
               // if (dystansValue == 42.195) return true;
               break;
             // case "> 42.195 km":
@@ -335,16 +339,122 @@ class _ZawodyScreenState extends State<ZawodyScreen> {
     );
   }
 
+  // Funkcja do wyświetlania opisu wyboru dystansów
+  void _pokazOpisDystansow(BuildContext context) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text("Informacje"),
+          content: Column(
+            mainAxisSize: MainAxisSize.min, // Zapobiega rozciąganiu okna
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Row(
+                children: [
+                  Container(
+                    width: 14,
+                    height: 14,
+                    color: Colors.green[300],
+                  ),
+                  const SizedBox(width: 6),
+                  const Expanded(
+                    child: Text(
+                      "Zawody górskie punktowane w serwisie RMT.",
+                      style: TextStyle(
+                        fontSize: 12,
+                        // fontStyle: FontStyle.italic,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 4),
+
+              // Drugi opis w kursywie
+              const Text(
+                "Kliknięcie w zawody -> wyszukiwarka Google.",
+                style: TextStyle(
+                  fontSize: 12,
+                  // fontStyle: FontStyle.italic,
+                ),
+              ),
+              const SizedBox(height: 8),
+              // Opis dystansów
+              const Text(
+                "Wybór dystansów:\n"
+                "< 5km: dystanse mniejsze od 5 km;\n"
+                "5 km: dystans 5 km lub większy od 5 i mniejszy od 6;\n"
+                "10 km: dystans 10 km lub większy od 10 i mniejszy od 11;\n"
+                "21 km: dystans 21 km lub większy od 21 i mniejszy od 22;\n"
+                "42 km: dystans 42 km lub większy od 42 i mniejszy od 43;\n"
+                "Ultra: Dystanse większe od 42.195 km.",
+                style: TextStyle(
+                  fontSize: 12, // Ustawienie rozmiaru czcionki
+                  fontWeight: FontWeight
+                      .normal, // Opcjonalnie: możesz dodać wagę czcionki
+                ),
+              ),
+
+              // Legenda - zielony kwadrat + opis
+            ],
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(context),
+              child: const Text("OK"),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final filtrowaneZawody = _filtrujZawody();
 
     return Scaffold(
       appBar: AppBar(
+        backgroundColor: Colors.orange,
         title: Row(
           children: [
-            const Text("Zawody | Filtry"),
+            const Text("Zawody  |"),
+            const SizedBox(width: 8),
+
+            // const SizedBox(width: 6),
+            // const Text("|"),
+            // const SizedBox(width: 8),
+
+            // Przycisk "ℹ Informacje"
+            InkWell(
+              onTap: () => _pokazOpisDystansow(context),
+              borderRadius: BorderRadius.circular(20),
+              child: Container(
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+                decoration: BoxDecoration(
+                  color: Colors.white.withOpacity(0.2), // Półprzezroczyste tło
+                  borderRadius: BorderRadius.circular(20),
+                ),
+                child: Tooltip(
+                  message: "Informacje",
+                  child: const Text(
+                    "ℹ",
+                    style: TextStyle(
+                      fontSize: 22,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.white, // Tekst w kolorze białym
+                    ),
+                  ),
+                ),
+              ),
+            ),
             const SizedBox(width: 10),
+
+            const Text("| Filtry"),
+            const SizedBox(width: 8),
+            // Switch do włączania filtrów
             Switch(
               value: _pokazFiltry,
               onChanged: (value) {
@@ -358,7 +468,6 @@ class _ZawodyScreenState extends State<ZawodyScreen> {
             ),
           ],
         ),
-        backgroundColor: Colors.orange,
       ),
       body: Center(
         child: ConstrainedBox(
@@ -411,8 +520,7 @@ class _ZawodyScreenState extends State<ZawodyScreen> {
                               decoration: const InputDecoration(
                                   labelText: "Typ zawodów"),
                               value: wybranyTypZawodow,
-                              items: ["Wszystkie", "Górskie"]
-                                  .map((typ) {
+                              items: ["Wszystkie", "Górskie"].map((typ) {
                                 return DropdownMenuItem(
                                   value: typ,
                                   child: Text(typ),
@@ -430,46 +538,25 @@ class _ZawodyScreenState extends State<ZawodyScreen> {
                       const SizedBox(height: 10),
                       // Filtr dystansów
                       Wrap(
-                        children: dystanseOpcje.map((dystans) {
-                          return FilterChip(
-                            label: Text(dystans),
-                            selected: wybraneDystanse.contains(dystans),
-                            onSelected: (isSelected) {
-                              setState(() {
-                                if (isSelected) {
-                                  wybraneDystanse.add(dystans);
-                                } else {
-                                  wybraneDystanse.remove(dystans);
-                                }
-                              });
-                            },
-                          );
-                        }).toList(),
-                      ),
-
-                      const SizedBox(height: 4),
-                      // Zielony kwadrat obok tekstu jak legenda
-                      Row(
+                        spacing: 1.0, // Odstępy między elementami
                         children: [
-                          Container(
-                            width: 14,
-                            height: 14,
-                            color: Colors.green[300],
-                          ),
-                          const SizedBox(width: 6),
-                          const Text(
-                            "Zawody górskie punktowane w serwisie RMT.",
-                            style: TextStyle(
-                                fontSize: 12, fontStyle: FontStyle.italic),
-                          ),
+                          // Użycie spread operator (...) do rozpakowania listy elementów
+                          ...dystanseOpcje.map((dystans) {
+                            return FilterChip(
+                              label: Text(dystans),
+                              selected: wybraneDystanse.contains(dystans),
+                              onSelected: (isSelected) {
+                                setState(() {
+                                  if (isSelected) {
+                                    wybraneDystanse.add(dystans);
+                                  } else {
+                                    wybraneDystanse.remove(dystans);
+                                  }
+                                });
+                              },
+                            );
+                          }).toList(),
                         ],
-                      ),
-                      const SizedBox(height: 2),
-                      // Drugi tekst w kursywie
-                      Text(
-                        "Kliknięcie w zawody -> wyszukiwarka Google.",
-                        style: TextStyle(
-                            fontSize: 12, fontStyle: FontStyle.italic),
                       ),
                     ],
                   ),
