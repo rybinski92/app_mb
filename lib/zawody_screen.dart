@@ -442,7 +442,7 @@ class _ZawodyScreenState extends State<ZawodyScreen> {
                   child: const Text(
                     "ℹ",
                     style: TextStyle(
-                      fontSize: 22,
+                      fontSize: 20,
                       fontWeight: FontWeight.bold,
                       color: Colors.white, // Tekst w kolorze białym
                     ),

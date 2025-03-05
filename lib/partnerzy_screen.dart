@@ -35,12 +35,12 @@ class PartnerzyScreen extends StatelessWidget {
                   "zdjecia/partnerzy/gmoto.jpg",
                   "https://gmoto.pl/",
                 ),
-                const SizedBox(height: 20),
-                _buildPartnerCard(
-                  "Zen.com Expo",
-                  "zdjecia/partnerzy/zen_com.jpg",
-                  "https://expo.zen.com/",
-                ),
+                // const SizedBox(height: 20),
+                // _buildPartnerCard(
+                //   "Zen.com Expo",
+                //   "zdjecia/partnerzy/zen_com.jpg",
+                //   "https://expo.zen.com/",
+                // ),
                 const SizedBox(height: 30),
 
                 // Przycisk "Zostań Partnerem"
