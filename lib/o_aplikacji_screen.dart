@@ -15,7 +15,7 @@ class _OApkScreenState extends State<OApkScreen> {
   final TextEditingController _controller = TextEditingController();
   final String apiUrl =
       "https://api.appsheet.com/api/v2/apps/3b42e9e3-47fd-4cf0-8ee4-aefaab5b9795/tables/Arkusz1/Add";
-  final String apiKey = Config.apiKey4;
+  // final String apiKey = Config.apiKey4;
 
 
 
@@ -27,7 +27,7 @@ class _OApkScreenState extends State<OApkScreen> {
     }
 
     final String message = _controller.text;
-    // final String? apiKey4 = await Config.getApiKey4();
+    final String? apiKey4 = await Config.getApiKey4();
 
     try {
       final url = Uri.parse(apiUrl);
@@ -36,8 +36,8 @@ class _OApkScreenState extends State<OApkScreen> {
         headers: {
           "Accept": "application/json",
           "Content-Type": "application/json; charset=utf-8",
-          "ApplicationAccessKey": apiKey,
-          // "ApplicationAccessKey": apiKey4 ?? "",
+          // "ApplicationAccessKey": apiKey,
+          "ApplicationAccessKey": apiKey4 ?? "",
         },
         body: jsonEncode({
           "Action": "Add",
@@ -92,11 +92,12 @@ class _OApkScreenState extends State<OApkScreen> {
               children: [
                 // Tekst informacyjny
                 const Text(
-                  "Zawody, które zostały dodane pojawią się w ciągu 1-2 dni.\n\n"
+                  "Zawody, które zostały dodane pojawią się\n"
+                  "w ciągu 1-2 dni.\n\n"
                   "Jeśli widzisz błąd, masz propozycję współpracy lub chcesz zostać Partnerem aplikacji, "
                   "skontaktuj się z nami:\n\n",
                   textAlign: TextAlign.center,
-                  style: TextStyle(fontSize: 15),
+                  style: TextStyle(fontSize: 14),
                 ),
 
                 // Pole tekstowe do wiadomości
@@ -123,7 +124,7 @@ class _OApkScreenState extends State<OApkScreen> {
                   onPressed: _sendMessageToAppSheet,
                   child: const Text(
                     "Wyślij wiadomość",
-                    style: TextStyle(fontSize: 16, color: Colors.white),
+                    style: TextStyle(fontSize: 15, color: Colors.white),
                   ),
                 ),
                 const SizedBox(height: 30),
@@ -139,7 +140,7 @@ class _OApkScreenState extends State<OApkScreen> {
                       const Text(
                         "adam.mojbieg@gmail.com",
                         style: TextStyle(
-                            fontSize: 16, fontWeight: FontWeight.bold),
+                            fontSize: 15, fontWeight: FontWeight.bold),
                       ),
                     ],
                   ),
@@ -156,7 +157,7 @@ class _OApkScreenState extends State<OApkScreen> {
                   onPressed: () => Navigator.pop(context),
                   child: const Text(
                     "Powrót",
-                    style: TextStyle(fontSize: 16, color: Colors.white),
+                    style: TextStyle(fontSize: 15, color: Colors.white),
                   ),
                 ),
 
@@ -165,7 +166,7 @@ class _OApkScreenState extends State<OApkScreen> {
                 // Nazwa aplikacji na dole
                 const Text(
                   "a10i",
-                  style: TextStyle(fontSize: 18),
+                  style: TextStyle(fontSize: 16),
                   textAlign: TextAlign.center,
                 ),
               ],

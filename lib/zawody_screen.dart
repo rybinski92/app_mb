@@ -3,6 +3,8 @@ import 'package:url_launcher/url_launcher.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 import 'config.dart';
+import 'package:provider/provider.dart'; // Dodaj import Provider
+import 'scalowanie.dart'; // Importuj ScaleNotifier
 
 class ZawodyScreen extends StatefulWidget {
   const ZawodyScreen({super.key});
@@ -27,7 +29,7 @@ class _ZawodyScreenState extends State<ZawodyScreen> {
 
   final String apiUrl =
       "https://api.appsheet.com/api/v2/apps/566e1354-d7f1-49a1-bb85-6ce2f26ce8b4/tables/zawody/records";
-  final String apiKey = Config.apiKey3;
+  // final String apiKey = Config.apiKey3;
 
   final List<String> dystanseOpcje = [
     "< 5 km",
@@ -63,14 +65,14 @@ class _ZawodyScreenState extends State<ZawodyScreen> {
   Future<void> _pobierzDaneZAppSheet() async {
     try {
       final url = Uri.parse(apiUrl);
-      // final String? apiKey3 = await Config.getApiKey3();
+      final String? apiKey3 = await Config.getApiKey3();
       final response = await http.post(
         url,
         headers: {
           "Accept": "application/json",
           "Content-Type": "application/json; charset=utf-8",
-          "ApplicationAccessKey": apiKey,
-          // "ApplicationAccessKey": apiKey3 ?? "",
+          // "ApplicationAccessKey": apiKey,
+          "ApplicationAccessKey": apiKey3 ?? "",
         },
         body: jsonEncode({
           "Action": "Find",
@@ -412,6 +414,7 @@ class _ZawodyScreenState extends State<ZawodyScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final scaleNotifier = Provider.of<ScaleNotifier>(context); // Pobierz ScaleNotifier
     final filtrowaneZawody = _filtrujZawody();
 
     return Scaffold(
@@ -431,18 +434,20 @@ class _ZawodyScreenState extends State<ZawodyScreen> {
               onTap: () => _pokazOpisDystansow(context),
               borderRadius: BorderRadius.circular(20),
               child: Container(
-                padding:
-                    const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+                padding: EdgeInsets.symmetric(
+                horizontal: 10 * scaleNotifier.scale, // Skalowanie paddingu
+                vertical: 6 * scaleNotifier.scale,
+              ),
                 decoration: BoxDecoration(
                   color: Colors.white.withOpacity(0.2), // Półprzezroczyste tło
                   borderRadius: BorderRadius.circular(20),
                 ),
                 child: Tooltip(
                   message: "Informacje",
-                  child: const Text(
+                  child: Text(
                     "ℹ",
                     style: TextStyle(
-                      fontSize: 20,
+                      fontSize: 18,
                       fontWeight: FontWeight.bold,
                       color: Colors.white, // Tekst w kolorze białym
                     ),
@@ -478,7 +483,7 @@ class _ZawodyScreenState extends State<ZawodyScreen> {
             children: [
               if (_pokazFiltry) // Pokazujemy filtry tylko, jeśli _pokazFiltry == true
                 Padding(
-                  padding: const EdgeInsets.all(8.0),
+                  padding: EdgeInsets.all(8.0 * scaleNotifier.scale),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
@@ -493,7 +498,7 @@ class _ZawodyScreenState extends State<ZawodyScreen> {
                         ),
                         onTap: _wybierzWojewodztwa,
                       ),
-                      const SizedBox(height: 10),
+                      SizedBox(height: 10 * scaleNotifier.scale), // Skalowanie odstępu
                       Row(
                         children: [
                           Expanded(
@@ -504,7 +509,12 @@ class _ZawodyScreenState extends State<ZawodyScreen> {
                               items: miesiace.map((mies) {
                                 return DropdownMenuItem(
                                   value: mies,
-                                  child: Text(mies),
+                                  child: Text(
+                                  mies,
+                                  style: TextStyle(
+                                    fontSize: 16, // Skalowanie czcionki
+                                  ),
+                                ),
                                 );
                               }).toList(),
                               onChanged: (value) {
@@ -514,7 +524,7 @@ class _ZawodyScreenState extends State<ZawodyScreen> {
                               },
                             ),
                           ),
-                          const SizedBox(width: 10),
+                          SizedBox(width: 10 * scaleNotifier.scale),
                           Expanded(
                             child: DropdownButtonFormField<String>(
                               decoration: const InputDecoration(
@@ -523,7 +533,12 @@ class _ZawodyScreenState extends State<ZawodyScreen> {
                               items: ["Wszystkie", "Górskie"].map((typ) {
                                 return DropdownMenuItem(
                                   value: typ,
-                                  child: Text(typ),
+                                  child: Text(
+                                  typ,
+                                  style: TextStyle(
+                                    fontSize: 16, // Skalowanie czcionki
+                                  ),
+                                ),
                                 );
                               }).toList(),
                               onChanged: (value) {
@@ -535,15 +550,20 @@ class _ZawodyScreenState extends State<ZawodyScreen> {
                           ),
                         ],
                       ),
-                      const SizedBox(height: 10),
+                      SizedBox(height: 10 * scaleNotifier.scale),
                       // Filtr dystansów
                       Wrap(
-                        spacing: 1.0, // Odstępy między elementami
+                        spacing: 1.0 * scaleNotifier.scale, // Odstępy między elementami
                         children: [
                           // Użycie spread operator (...) do rozpakowania listy elementów
                           ...dystanseOpcje.map((dystans) {
                             return FilterChip(
-                              label: Text(dystans),
+                              label: Text(
+                              dystans,
+                              style: TextStyle(
+                                fontSize: 14 * scaleNotifier.scale, // Skalowanie czcionki
+                              ),
+                            ),
                               selected: wybraneDystanse.contains(dystans),
                               onSelected: (isSelected) {
                                 setState(() {
@@ -571,10 +591,24 @@ class _ZawodyScreenState extends State<ZawodyScreen> {
                           ? Colors.green[300]
                           : Colors.white,
                       child: ListTile(
-                        title: Text(zawod["nazwa"] ?? ''),
+                        title: Text(
+                        zawod["nazwa"] ?? '',
+                        style: TextStyle(
+                          fontSize: 18 * scaleNotifier.scale, // Skalowanie czcionki
+                        ),
+                      ),
                         subtitle: Text(
-                            "Data: ${zawod["dataPrzetworzona"]}\nMiejsce: ${zawod["miejsce"]}\nDystanse: ${zawod["dystanse"]}"),
-                        trailing: Text(zawod["wojewodztwo"] ?? ''),
+                        "Data: ${zawod["dataPrzetworzona"]}\nMiejsce: ${zawod["miejsce"]}\nDystanse: ${zawod["dystanse"]}",
+                        style: TextStyle(
+                          fontSize: 14 * scaleNotifier.scale, // Skalowanie czcionki
+                        ),
+                      ),
+                        trailing: Text(
+                        zawod["wojewodztwo"] ?? '',
+                        style: TextStyle(
+                          fontSize: 14 * scaleNotifier.scale, // Skalowanie czcionki
+                        ),
+                      ),
                         onTap: () => _otworzGoogle(zawod["nazwa"] ?? ''),
                       ),
                     );
@@ -588,3 +622,4 @@ class _ZawodyScreenState extends State<ZawodyScreen> {
     );
   }
 }
+
