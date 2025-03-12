@@ -202,7 +202,7 @@ class _HomePageState extends State<HomePage> {
         ),
         child: Column(
           children: [
-            const SizedBox(height: 35),
+            const SizedBox(height: odstep),
 
             // Przyciski skalowania (+ i -)
             Align(

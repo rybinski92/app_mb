@@ -16,3 +16,5 @@ class Config {
     defaultValue: 'default_key_4'
   );
 }
+
+const double odstep = 10.0;
