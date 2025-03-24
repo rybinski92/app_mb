@@ -11,6 +11,11 @@ import 'dart:convert';
 import 'config.dart';
 import 'package:provider/provider.dart';
 import 'scalowanie.dart'; // Zaimportuj plik z ScaleNotifier
+import 'package:shared_preferences/shared_preferences.dart';
+import 'package:crypto/crypto.dart';
+
+
+
 
 void main() {
   runApp(
@@ -46,118 +51,131 @@ class HomePage extends StatefulWidget {
 
 class _HomePageState extends State<HomePage> {
   List<Map<String, String>> polecaneZawody = [];
-
-  // URL AppSheet API (Zmień na swój)
-  final String apiUrl =
-      "https://api.appsheet.com/api/v2/apps/5408db07-71e1-4309-a30a-dc9c7c1ae7a3/tables/Arkusz1/records";
+  final String apiUrl = "https://api.appsheet.com/api/v2/apps/5408db07-71e1-4309-a30a-dc9c7c1ae7a3/tables/Arkusz1/records";
+  bool _isFetching = false;
 
   @override
   void initState() {
     super.initState();
-    _fetchPolecaneZawody();
+    _initData();
   }
 
-  Future<void> _fetchPolecaneZawody() async {
+  Future<void> _initData() async {
+    // Najpierw ładujemy dane lokalne
+    await _loadLocalData();
+    // Potem sprawdzamy aktualizacje
+    await _checkAndFetchData();
+  }
+
+  Future<void> _loadLocalData() async {
+    final prefs = await SharedPreferences.getInstance();
+    final storedData = prefs.getString('polecaneZawody');
+    
+    if (storedData != null) {
+      setState(() {
+        polecaneZawody = List<Map<String, String>>.from(
+            jsonDecode(storedData).map((e) => Map<String, String>.from(e)));
+      });
+      print("✅ Załadowano lokalne dane (${polecaneZawody.length} zawodów)");
+    }
+  }
+
+  Future<void> _checkAndFetchData() async {
+    if (_isFetching) return;
+    _isFetching = true;
+
     try {
-      final url = Uri.parse(
-          "https://api.appsheet.com/api/v2/apps/5408db07-71e1-4309-a30a-dc9c7c1ae7a3/tables/Arkusz1/records");
-      final String apiKey2 = Config.apiKey2;
-      // final String? apiKey2 = await Config.getApiKey2();
+      final prefs = await SharedPreferences.getInstance();
+      final response = await http.post(
+        Uri.parse(apiUrl),
+        headers: {
+          "Accept": "application/json",
+          "Content-Type": "application/json; charset=utf-8",
+          "ApplicationAccessKey": Config.apiKey2,
+        },
+        body: jsonEncode({
+          "Action": "Find",
+          "Properties": {"Locale": "pl-PL"},
+          "Rows": []
+        }),
+      );
 
-      final response = await http.post(url,
-          headers: {
-            "Accept": "application/json",
-            "Content-Type": "application/json; charset=utf-8",
-            "ApplicationAccessKey": apiKey2,
-            // "ApplicationAccessKey": apiKey2 ?? "",
-          },
-          body: jsonEncode({
-            "Action": "Find", // AppSheet wymaga tej akcji do pobierania danych
-            "Properties": {"Locale": "pl-PL"},
-            "Rows": []
-          }) // pusty JSON – AppSheet może tego wymagać!
-          );
-
-      // print("📩 Odpowiedź API (${response.statusCode}): ${response.body}");
-
-      if (response.statusCode == 200) {
-        if (response.body.isEmpty) {
-          print("⚠ API zwróciło pustą odpowiedź!");
-          return;
-        }
-
-        // Ręczne dekodowanie odpowiedzi jako UTF-8
+      if (response.statusCode == 200 && response.body.isNotEmpty) {
         final decodedBody = utf8.decode(response.bodyBytes);
+        final String newHash = sha256.convert(utf8.encode(decodedBody)).toString();
+        final String? oldHash = prefs.getString('polecaneZawodyHash');
 
-        List<dynamic> data;
-        try {
-          data = json.decode(decodedBody);
-        } catch (e) {
-          print("❌ Błąd dekodowania JSON: $e");
-          return;
+        if (oldHash == null || oldHash != newHash) {
+          print("🔄 Wykryto zmiany w danych, pobieram aktualizacje...");
+          await _processAndSaveData(decodedBody, newHash, prefs);
+        } else {
+          print("⏩ Brak zmian w danych, używam lokalnej wersji");
         }
-
-        if (data.isEmpty) {
-          print("⚠ API zwróciło pustą listę zawodów!");
-          return;
-        }
-
-        // Logowanie nazw kluczy w pierwszym rekordzie (żeby sprawdzić poprawność)
-        // print("🔑 Klucze API: ${data[0].keys}");
-
-        setState(() {
-          polecaneZawody = data.map((zawod) {
-            // Obsługa potencjalnych zmian nazw kolumn w API
-            final nazwa =
-                _handlePolishCharacters(zawod["nazwa"] ?? zawod["Nazwa"] ?? "");
-            final rawDate = zawod["data"] ?? zawod["Data"] ?? "";
-            final dystans = zawod["dystans"] ?? zawod["Dystans"] ?? "";
-            final miejsce = zawod["miejsce"] ?? zawod["Miejsce"] ?? "";
-            final wojewodztwo =
-                zawod["wojewodztwo"] ?? zawod["Wojewodztwo"] ?? "";
-            // final link = zawod["link"] ?? zawod["Link"] ?? "";
-            var link = zawod["link"] ?? zawod["Link"] ?? "";
-
-            // Jeśli link to JSON w postaci tekstowej, przetwórz go
-            if (link is String) {
-              try {
-                final linkData = jsonDecode(link);
-                link = linkData["Url"] ?? "";
-              } catch (e) {
-                print("❌ Błąd parsowania linku JSON: $e");
-              }
-            }
-
-// Poprawienie formatu daty na dd-MM-yyyy
-            String formattedDate = rawDate;
-            try {
-              final parsedDate = _parseDate(rawDate);
-              if (parsedDate != null) {
-                formattedDate =
-                    "${parsedDate.day.toString().padLeft(2, '0')}-${parsedDate.month.toString().padLeft(2, '0')}-${parsedDate.year}";
-              }
-            } catch (e) {
-              print("⚠ Błąd parsowania daty: $rawDate");
-            }
-
-            return {
-              "nazwa": nazwa.toString(),
-              "data": formattedDate,
-              "dystans": dystans.toString(),
-              "miejsce": miejsce.toString(),
-              "wojewodztwo": wojewodztwo.toString(),
-              "link": link.toString(),
-            };
-          }).toList();
-        });
-
-        print("✅ Pobrano ${polecaneZawody.length} zawodów!");
-      } else {
-        print(
-            "❌ Błąd pobierania danych: ${response.statusCode} - ${response.body}");
       }
     } catch (e) {
-      print("❌ Błąd połączenia: $e");
+      print("❌ Błąd podczas sprawdzania aktualizacji: $e");
+    } finally {
+      _isFetching = false;
+    }
+  }
+
+  Future<void> _processAndSaveData(String decodedBody, String newHash, SharedPreferences prefs) async {
+    try {
+      List<dynamic> data = json.decode(decodedBody);
+      
+      if (data.isEmpty) {
+        print("⚠ API zwróciło pustą listę zawodów!");
+        return;
+      }
+
+      List<Map<String, String>> newPolecaneZawody = data.map((zawod) {
+        final nazwa = _handlePolishCharacters(zawod["nazwa"] ?? zawod["Nazwa"] ?? "");
+        final rawDate = zawod["data"] ?? zawod["Data"] ?? "";
+        final dystans = zawod["dystans"] ?? zawod["Dystans"] ?? "";
+        final miejsce = zawod["miejsce"] ?? zawod["Miejsce"] ?? "";
+        final wojewodztwo = zawod["wojewodztwo"] ?? zawod["Wojewodztwo"] ?? "";
+        var link = zawod["link"] ?? zawod["Link"] ?? "";
+
+        if (link is String) {
+          try {
+            final linkData = jsonDecode(link);
+            link = linkData["Url"] ?? "";
+          } catch (e) {
+            print("❌ Błąd parsowania linku JSON: $e");
+          }
+        }
+
+        String formattedDate = rawDate;
+        try {
+          final parsedDate = _parseDate(rawDate);
+          if (parsedDate != null) {
+            formattedDate =
+                "${parsedDate.day.toString().padLeft(2, '0')}-${parsedDate.month.toString().padLeft(2, '0')}-${parsedDate.year}";
+          }
+        } catch (e) {
+          print("⚠ Błąd parsowania daty: $rawDate");
+        }
+
+        return {
+          "nazwa": nazwa.toString(),
+          "data": formattedDate,
+          "dystans": dystans.toString(),
+          "miejsce": miejsce.toString(),
+          "wojewodztwo": wojewodztwo.toString(),
+          "link": link.toString(),
+        };
+      }).toList();
+
+      await prefs.setString('polecaneZawody', jsonEncode(newPolecaneZawody));
+      await prefs.setString('polecaneZawodyHash', newHash);
+
+      setState(() {
+        polecaneZawody = newPolecaneZawody;
+      });
+
+      print("✅ Zaktualizowano dane (${polecaneZawody.length} zawodów)");
+    } catch (e) {
+      print("❌ Błąd przetwarzania danych: $e");
     }
   }
 
@@ -342,7 +360,7 @@ class _HomePageState extends State<HomePage> {
 
   Widget _buildButton(
       BuildContext context, String text, VoidCallback onPressed) {
-      final scaleNotifier = Provider.of<ScaleNotifier>(context);
+    final scaleNotifier = Provider.of<ScaleNotifier>(context);
     return ElevatedButton(
       style: ElevatedButton.styleFrom(
         backgroundColor: Colors.white,
@@ -351,7 +369,10 @@ class _HomePageState extends State<HomePage> {
         padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
       ),
       onPressed: onPressed,
-      child: Text(text, style: TextStyle(fontSize: 15 * scaleNotifier.scale,)),
+      child: Text(text,
+          style: TextStyle(
+            fontSize: 15 * scaleNotifier.scale,
+          )),
     );
   }
 
@@ -393,12 +414,14 @@ class _HomePageState extends State<HomePage> {
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  Text("📏 ${zawod["dystans"] ?? ''}",
+                  Text(
+                    "📏 ${zawod["dystans"] ?? ''}",
                     style: TextStyle(
                       fontSize: 14 * scaleNotifier.scale, // Skalowanie czcionki
                     ),
                   ),
-                  Text("📌 ${zawod["wojewodztwo"] ?? ''}",
+                  Text(
+                    "📌 ${zawod["wojewodztwo"] ?? ''}",
                     style: TextStyle(
                       fontSize: 14 * scaleNotifier.scale, // Skalowanie czcionki
                     ),

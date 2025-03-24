@@ -5,6 +5,8 @@ import 'dart:convert';
 import 'config.dart';
 import 'package:provider/provider.dart'; // Dodaj import Provider
 import 'scalowanie.dart'; // Importuj ScaleNotifier
+import 'package:shared_preferences/shared_preferences.dart';
+import 'package:crypto/crypto.dart';
 
 class ZawodyScreen extends StatefulWidget {
   const ZawodyScreen({super.key});
@@ -26,6 +28,7 @@ class _ZawodyScreenState extends State<ZawodyScreen> {
 
   bool _pokazFiltry =
       true; // <-- Nowa zmienna do sterowania widocznością filtrów
+  bool _isFetching = false; // Nowa flaga
 
   final String apiUrl =
       "https://api.appsheet.com/api/v2/apps/566e1354-d7f1-49a1-bb85-6ce2f26ce8b4/tables/zawody/records";
@@ -58,7 +61,74 @@ class _ZawodyScreenState extends State<ZawodyScreen> {
   @override
   void initState() {
     super.initState();
-    _pobierzDaneZAppSheet();
+    // _pobierzDaneZAppSheet();
+    _loadLocalData();
+  }
+
+  /// Ładuje dane z pamięci lokalnej lub pobiera je z AppSheet, jeśli są nieaktualne
+  Future<void> _loadLocalData() async {
+    if (_isFetching) return;
+    _isFetching = true;
+
+    final prefs = await SharedPreferences.getInstance();
+    
+    // Najpierw sprawdź czy mamy zapisane dane lokalnie
+    final localData = prefs.getString('zawodyData');
+    if (localData != null) {
+      final decodedData = json.decode(localData);
+      
+      final zawodyData = List<Map<String, dynamic>>.from(decodedData['zawody'])
+          .map((zawod) => zawod.map((key, value) =>
+              MapEntry(key.toString(), value.toString())))
+          .toList();
+
+      final wojewodztwaData = List<String>.from(decodedData['wojewodztwa']);
+      final miesiaceData = List<String>.from(decodedData['miesiace']);
+
+      setState(() {
+        zawody = zawodyData;
+        wojewodztwa = wojewodztwaData;
+        miesiace = miesiaceData;
+      });
+    }
+    
+    // Zawsze sprawdzamy czy są nowe dane w AppSheet
+    await _pobierzDaneZAppSheet();
+    _isFetching = false;
+  }
+
+  Future<void> _saveLocalData() async {
+    final prefs = await SharedPreferences.getInstance();
+
+    // Generuj unikalny identyfikator (timestamp)
+    final timestamp = DateTime.now().toIso8601String();
+
+    // Przygotuj dane do zapisu
+    final dataToSave = {
+      'zawody': zawody,
+      'wojewodztwa': wojewodztwa,
+      'miesiace': miesiace,
+      'timestamp': timestamp, // Dodaj timestamp
+    };
+
+    // Sprawdź, czy dane już istnieją
+    final existingData = prefs.getString('zawodyData');
+    if (existingData != null) {
+      final existingJson = json.decode(existingData);
+      final existingTimestamp = existingJson['timestamp'];
+
+      // Jeśli dane są identyczne, pomiń zapis
+      if (existingTimestamp == timestamp) {
+        print("⏩ Dane są już aktualne, pomijam zapis.");
+        return;
+      }
+    }
+
+    // Zapisz dane
+    prefs.setString('zawodyData', json.encode(dataToSave));
+    prefs.setString(
+        'lastUpdate', timestamp); // Zaktualizuj czas ostatniej aktualizacji
+    print("✅ Zapisano dane lokalnie (timestamp: $timestamp)");
   }
 
   /// 📡 Pobiera dane z AppSheet API
@@ -93,6 +163,20 @@ class _ZawodyScreenState extends State<ZawodyScreen> {
 
         final decodedBody = utf8.decode(response.bodyBytes);
         final List<dynamic> data = json.decode(decodedBody);
+
+        // 🔹 Oblicz hash pobranych danych
+      final String newHash = sha256.convert(utf8.encode(json.encode(data))).toString();
+
+      final prefs = await SharedPreferences.getInstance();
+      final String? oldHash = prefs.getString('dataHash');
+
+      if (oldHash != null && oldHash == newHash) {
+        print("⏩ Dane są już aktualne, pomijam zapis.");
+        return;
+      }
+
+      // 🔹 Aktualizujemy hash, bo dane się zmieniły
+      await prefs.setString('dataHash', newHash);
 
         final wojewodztwaSet = <String>{"Wszystkie województwa"};
         final miesiaceSet = <String>{"Cały rok"};
@@ -143,43 +227,42 @@ class _ZawodyScreenState extends State<ZawodyScreen> {
             "ZACHODNIOPOMORSKIE"
           ];
 
-          setState(() {
-            // Sortowanie miesięcy wg poprawnej kolejności
-            miesiace = miesiaceSet.toList();
-            miesiace.sort((a, b) => (miesiaceKolejnosc[a] ?? 99)
-                .compareTo(miesiaceKolejnosc[b] ?? 99));
+          // Sortowanie miesięcy wg poprawnej kolejności
+          miesiace = miesiaceSet.toList();
+          miesiace.sort((a, b) => (miesiaceKolejnosc[a] ?? 99)
+              .compareTo(miesiaceKolejnosc[b] ?? 99));
 
-            // Pobranie listy województw
-            wojewodztwa = wojewodztwaSet.toList();
+          // Pobranie listy województw
+          wojewodztwa = wojewodztwaSet.toList();
 
-            // Usunięcie "Wszystkie województwa" przed sortowaniem
-            wojewodztwa.remove("Wszystkie województwa");
+          // Usunięcie "Wszystkie województwa" przed sortowaniem
+          wojewodztwa.remove("Wszystkie województwa");
 
-            // Sortowanie wg poprawnej kolejności
-            wojewodztwa.sort((a, b) {
-              final indexA = poprawnaKolejnoscWojewodztw.indexOf(a);
-              final indexB = poprawnaKolejnoscWojewodztw.indexOf(b);
+          // Sortowanie wg poprawnej kolejności
+          wojewodztwa.sort((a, b) {
+            final indexA = poprawnaKolejnoscWojewodztw.indexOf(a);
+            final indexB = poprawnaKolejnoscWojewodztw.indexOf(b);
 
-              if (indexA == -1)
-                return 1; // Jeśli województwo nie jest w liście, daj na koniec
-              if (indexB == -1) return -1;
-              return indexA.compareTo(indexB);
-            });
-
-            // Dodanie "Wszystkie województwa" na początek listy
-            wojewodztwa.insert(0, "Wszystkie województwa");
+            if (indexA == -1)
+              return 1; // Jeśli województwo nie jest w liście, daj na koniec
+            if (indexB == -1) return -1;
+            return indexA.compareTo(indexB);
           });
+
+          // Dodanie "Wszystkie województwa" na początek listy
+          wojewodztwa.insert(0, "Wszystkie województwa");
         });
 
-        print("✅ Pobrano ${zawody.length} zawodów!");
-      } else {
-        print(
-            "❌ Błąd pobierania danych: ${response.statusCode} - ${response.body}");
-      }
-    } catch (e) {
-      print("❌ Błąd połączenia: $e");
+      // ✅ Zapisujemy nową wersję danych w pamięci lokalnej
+      await _saveLocalData();
+      print("✅ Pobrano ${zawody.length} zawodów i zapisano lokalnie!");
+    } else {
+      print("❌ Błąd pobierania danych: ${response.statusCode} - ${response.body}");
     }
+  } catch (e) {
+    print("❌ Błąd połączenia: $e");
   }
+}
 
   /// ✅ Formatuje datę z MM/DD/YYYY na DD-MM-YYYY
   String _formatDate(String rawDate) {
@@ -414,7 +497,8 @@ class _ZawodyScreenState extends State<ZawodyScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final scaleNotifier = Provider.of<ScaleNotifier>(context); // Pobierz ScaleNotifier
+    final scaleNotifier =
+        Provider.of<ScaleNotifier>(context); // Pobierz ScaleNotifier
     final filtrowaneZawody = _filtrujZawody();
 
     return Scaffold(
@@ -435,9 +519,9 @@ class _ZawodyScreenState extends State<ZawodyScreen> {
               borderRadius: BorderRadius.circular(20),
               child: Container(
                 padding: EdgeInsets.symmetric(
-                horizontal: 10 * scaleNotifier.scale, // Skalowanie paddingu
-                vertical: 6 * scaleNotifier.scale,
-              ),
+                  horizontal: 10 * scaleNotifier.scale, // Skalowanie paddingu
+                  vertical: 6 * scaleNotifier.scale,
+                ),
                 decoration: BoxDecoration(
                   color: Colors.white.withOpacity(0.2), // Półprzezroczyste tło
                   borderRadius: BorderRadius.circular(20),
@@ -498,7 +582,9 @@ class _ZawodyScreenState extends State<ZawodyScreen> {
                         ),
                         onTap: _wybierzWojewodztwa,
                       ),
-                      SizedBox(height: 10 * scaleNotifier.scale), // Skalowanie odstępu
+                      SizedBox(
+                          height:
+                              10 * scaleNotifier.scale), // Skalowanie odstępu
                       Row(
                         children: [
                           Expanded(
@@ -510,11 +596,11 @@ class _ZawodyScreenState extends State<ZawodyScreen> {
                                 return DropdownMenuItem(
                                   value: mies,
                                   child: Text(
-                                  mies,
-                                  style: TextStyle(
-                                    fontSize: 16, // Skalowanie czcionki
+                                    mies,
+                                    style: TextStyle(
+                                      fontSize: 16, // Skalowanie czcionki
+                                    ),
                                   ),
-                                ),
                                 );
                               }).toList(),
                               onChanged: (value) {
@@ -534,11 +620,11 @@ class _ZawodyScreenState extends State<ZawodyScreen> {
                                 return DropdownMenuItem(
                                   value: typ,
                                   child: Text(
-                                  typ,
-                                  style: TextStyle(
-                                    fontSize: 16, // Skalowanie czcionki
+                                    typ,
+                                    style: TextStyle(
+                                      fontSize: 16, // Skalowanie czcionki
+                                    ),
                                   ),
-                                ),
                                 );
                               }).toList(),
                               onChanged: (value) {
@@ -553,17 +639,20 @@ class _ZawodyScreenState extends State<ZawodyScreen> {
                       SizedBox(height: 10 * scaleNotifier.scale),
                       // Filtr dystansów
                       Wrap(
-                        spacing: 1.0 * scaleNotifier.scale, // Odstępy między elementami
+                        spacing: 1.0 *
+                            scaleNotifier.scale, // Odstępy między elementami
                         children: [
                           // Użycie spread operator (...) do rozpakowania listy elementów
                           ...dystanseOpcje.map((dystans) {
                             return FilterChip(
                               label: Text(
-                              dystans,
-                              style: TextStyle(
-                                fontSize: 14 * scaleNotifier.scale, // Skalowanie czcionki
+                                dystans,
+                                style: TextStyle(
+                                  fontSize: 14 *
+                                      scaleNotifier
+                                          .scale, // Skalowanie czcionki
+                                ),
                               ),
-                            ),
                               selected: wybraneDystanse.contains(dystans),
                               onSelected: (isSelected) {
                                 setState(() {
@@ -592,23 +681,26 @@ class _ZawodyScreenState extends State<ZawodyScreen> {
                           : Colors.white,
                       child: ListTile(
                         title: Text(
-                        zawod["nazwa"] ?? '',
-                        style: TextStyle(
-                          fontSize: 18 * scaleNotifier.scale, // Skalowanie czcionki
+                          zawod["nazwa"] ?? '',
+                          style: TextStyle(
+                            fontSize:
+                                18 * scaleNotifier.scale, // Skalowanie czcionki
+                          ),
                         ),
-                      ),
                         subtitle: Text(
-                        "Data: ${zawod["dataPrzetworzona"]}\nMiejsce: ${zawod["miejsce"]}\nDystanse: ${zawod["dystanse"]}",
-                        style: TextStyle(
-                          fontSize: 14 * scaleNotifier.scale, // Skalowanie czcionki
+                          "Data: ${zawod["dataPrzetworzona"]}\nMiejsce: ${zawod["miejsce"]}\nDystanse: ${zawod["dystanse"]}",
+                          style: TextStyle(
+                            fontSize:
+                                14 * scaleNotifier.scale, // Skalowanie czcionki
+                          ),
                         ),
-                      ),
                         trailing: Text(
-                        zawod["wojewodztwo"] ?? '',
-                        style: TextStyle(
-                          fontSize: 14 * scaleNotifier.scale, // Skalowanie czcionki
+                          zawod["wojewodztwo"] ?? '',
+                          style: TextStyle(
+                            fontSize:
+                                14 * scaleNotifier.scale, // Skalowanie czcionki
+                          ),
                         ),
-                      ),
                         onTap: () => _otworzGoogle(zawod["nazwa"] ?? ''),
                       ),
                     );
@@ -622,4 +714,3 @@ class _ZawodyScreenState extends State<ZawodyScreen> {
     );
   }
 }
-

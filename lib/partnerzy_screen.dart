@@ -32,8 +32,9 @@ class PartnerzyScreen extends StatelessWidget {
                 // Lista partnerów
                 _buildPartnerCard(
                   "Gmoto",
+                  "Sklep motocyklowy",
                   "zdjecia/partnerzy/gmoto.jpg",
-                  "https://gmoto.pl/",
+                  "https://gmoto.com/",
                 ),
                 // const SizedBox(height: 20),
                 // _buildPartnerCard(
@@ -73,7 +74,8 @@ class PartnerzyScreen extends StatelessWidget {
   }
 
   // Funkcja do tworzenia karty z informacjami o partnerze
-  Widget _buildPartnerCard(String name, String logoPath, String link) {
+  Widget _buildPartnerCard(
+      String name, String description, String logoPath, String link) {
     return GestureDetector(
       onTap: () => _launchURL(link), // Otwiera link po kliknięciu
       child: Card(
@@ -98,12 +100,25 @@ class PartnerzyScreen extends StatelessWidget {
               const SizedBox(width: 16),
               // Nazwa partnera
               Expanded(
-                child: Text(
-                  name,
-                  style: const TextStyle(
-                    fontSize: 20,
-                    fontWeight: FontWeight.bold,
-                  ),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      name,
+                      style: const TextStyle(
+                        fontSize: 20,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                    const SizedBox(height: 4), // Drobny odstęp między tekstami
+                    Text(
+                      description,
+                      style: const TextStyle(
+                        fontSize: 14,
+                        color: Color.fromARGB(255, 82, 80, 80),
+                      ),
+                    ),
+                  ],
                 ),
               ),
               // Ikona otwierania linku
