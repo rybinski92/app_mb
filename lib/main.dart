@@ -13,9 +13,7 @@ import 'package:provider/provider.dart';
 import 'scalowanie.dart'; // Zaimportuj plik z ScaleNotifier
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:crypto/crypto.dart';
-
-
-
+import 'package:flutter/foundation.dart';
 
 void main() {
   runApp(
@@ -51,7 +49,8 @@ class HomePage extends StatefulWidget {
 
 class _HomePageState extends State<HomePage> {
   List<Map<String, String>> polecaneZawody = [];
-  final String apiUrl = "https://api.appsheet.com/api/v2/apps/5408db07-71e1-4309-a30a-dc9c7c1ae7a3/tables/Arkusz1/records";
+  final String apiUrl =
+      "https://api.appsheet.com/api/v2/apps/5408db07-71e1-4309-a30a-dc9c7c1ae7a3/tables/Arkusz1/records";
   bool _isFetching = false;
 
   @override
@@ -70,7 +69,7 @@ class _HomePageState extends State<HomePage> {
   Future<void> _loadLocalData() async {
     final prefs = await SharedPreferences.getInstance();
     final storedData = prefs.getString('polecaneZawody');
-    
+
     if (storedData != null) {
       setState(() {
         polecaneZawody = List<Map<String, String>>.from(
@@ -102,7 +101,8 @@ class _HomePageState extends State<HomePage> {
 
       if (response.statusCode == 200 && response.body.isNotEmpty) {
         final decodedBody = utf8.decode(response.bodyBytes);
-        final String newHash = sha256.convert(utf8.encode(decodedBody)).toString();
+        final String newHash =
+            sha256.convert(utf8.encode(decodedBody)).toString();
         final String? oldHash = prefs.getString('polecaneZawodyHash');
 
         if (oldHash == null || oldHash != newHash) {
@@ -119,17 +119,19 @@ class _HomePageState extends State<HomePage> {
     }
   }
 
-  Future<void> _processAndSaveData(String decodedBody, String newHash, SharedPreferences prefs) async {
+  Future<void> _processAndSaveData(
+      String decodedBody, String newHash, SharedPreferences prefs) async {
     try {
       List<dynamic> data = json.decode(decodedBody);
-      
+
       if (data.isEmpty) {
         print("⚠ API zwróciło pustą listę zawodów!");
         return;
       }
 
       List<Map<String, String>> newPolecaneZawody = data.map((zawod) {
-        final nazwa = _handlePolishCharacters(zawod["nazwa"] ?? zawod["Nazwa"] ?? "");
+        final nazwa =
+            _handlePolishCharacters(zawod["nazwa"] ?? zawod["Nazwa"] ?? "");
         final rawDate = zawod["data"] ?? zawod["Data"] ?? "";
         final dystans = zawod["dystans"] ?? zawod["Dystans"] ?? "";
         final miejsce = zawod["miejsce"] ?? zawod["Miejsce"] ?? "";
@@ -268,8 +270,15 @@ class _HomePageState extends State<HomePage> {
                         builder: (context) => const RecommendedZawodyScreen()),
                   );
                 },
-                child: Text("Polecane zawody",
-                    style: TextStyle(fontSize: 15 * scaleNotifier.scale)),
+                child: Text(
+                  "Polecane zawody",
+                  style: TextStyle(
+                    fontSize: (MediaQuery.of(context).size.width > 500
+                            ? 500
+                            : MediaQuery.of(context).size.width) *
+                        0.035,
+                  ),
+                ),
               ),
             ),
 
@@ -296,60 +305,84 @@ class _HomePageState extends State<HomePage> {
             ),
 
             // Układ przycisków na dole
-            Padding(
-              padding: EdgeInsets.only(
-                  top: 15 * scaleNotifier.scale,
-                  bottom: 15.0 * scaleNotifier.scale),
-              child: Column(
-                children: [
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
+            Center(
+              child: ConstrainedBox(
+                constraints: const BoxConstraints(
+                    maxWidth: 500), // Maksymalna szerokość na dużych ekranach
+                child: Padding(
+                  padding:
+                      const EdgeInsets.symmetric(vertical: 20, horizontal: 25),
+                  child: Column(
+                    mainAxisSize: MainAxisSize
+                        .min, // Ważne dla poprawnego działania ConstrainedBox
                     children: [
-                      _buildButton(context, "Lista zawodów", () {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                              builder: (context) => const ZawodyScreen()),
-                        );
-                      }),
-                      SizedBox(width: 20 * scaleNotifier.scale),
-                      _buildButton(context, "Dodaj zawody", () {
-                        Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                                builder: (context) =>
-                                    const DodajZawodyScreen()));
-                      }),
+                      // Pierwszy rząd przycisków
+                      Row(
+                        children: [
+                          Expanded(
+                            child: _buildAutoScaleButton(
+                                context, "Lista zawodów", () {
+                              Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                      builder: (context) =>
+                                          const ZawodyScreen()));
+                            }),
+                          ),
+                          const SizedBox(width: 15),
+                          Expanded(
+                            child: _buildAutoScaleButton(
+                                context, "Dodaj zawody", () {
+                              Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                      builder: (context) =>
+                                          const DodajZawodyScreen()));
+                            }),
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: 15),
+                      // Drugi rząd przycisków
+                      Row(
+                        children: [
+                          Expanded(
+                            child:
+                                _buildAutoScaleButton(context, "Partnerzy", () {
+                              Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                      builder: (context) =>
+                                          const PartnerzyScreen()));
+                            }),
+                          ),
+                          const SizedBox(width: 10),
+                          Expanded(
+                            child: _buildAutoScaleButton(context, "Kalkulator",
+                                () {
+                              Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                      builder: (context) =>
+                                          const KalkulatorScreen()));
+                            }),
+                          ),
+                          const SizedBox(width: 10),
+                          Expanded(
+                            flex: 1,
+                            child: _buildAutoScaleButton(context, "📩", () {
+                              Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                      builder: (context) =>
+                                          const OApkScreen()));
+                            }),
+                          ),
+                        ],
+                      ),
                     ],
                   ),
-                  SizedBox(height: 10 * scaleNotifier.scale),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      _buildButton(context, "Partnerzy", () {
-                        Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                                builder: (context) => const PartnerzyScreen()));
-                      }),
-                      SizedBox(width: 13 * scaleNotifier.scale),
-                      _buildButton(context, "Kalkulator", () {
-                        Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                                builder: (context) =>
-                                    const KalkulatorScreen()));
-                      }),
-                      SizedBox(width: 11 * scaleNotifier.scale),
-                      _buildButton(context, "📩", () {
-                        Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                                builder: (context) => const OApkScreen()));
-                      }),
-                    ],
-                  ),
-                ],
+                ),
               ),
             ),
           ],
@@ -358,21 +391,30 @@ class _HomePageState extends State<HomePage> {
     );
   }
 
-  Widget _buildButton(
+// Funkcja do budowania przycisków z auto-skalingiem
+  Widget _buildAutoScaleButton(
       BuildContext context, String text, VoidCallback onPressed) {
-    final scaleNotifier = Provider.of<ScaleNotifier>(context);
+    final screenWidth = MediaQuery.of(context).size.width;
+    // Ustalamy maksymalną szerokość do skalowania - nie więcej niż 700px
+    final scalingWidth = screenWidth > 500 ? 500 : screenWidth;
+
     return ElevatedButton(
+      onPressed: onPressed,
       style: ElevatedButton.styleFrom(
         backgroundColor: Colors.white,
         foregroundColor: Colors.orange,
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-        padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+        padding: const EdgeInsets.symmetric(vertical: 12),
       ),
-      onPressed: onPressed,
-      child: Text(text,
+      child: FittedBox(
+        fit: BoxFit.scaleDown,
+        child: Text(
+          text,
           style: TextStyle(
-            fontSize: 15 * scaleNotifier.scale,
-          )),
+            // Skalujemy tylko do 700px szerokości
+            fontSize: scalingWidth * 0.035,
+          ),
+        ),
+      ),
     );
   }
 

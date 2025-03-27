@@ -558,6 +558,7 @@ class _ZawodyScreenState extends State<ZawodyScreen> {
           ],
         ),
       ),
+      
       body: Center(
         child: ConstrainedBox(
           constraints: const BoxConstraints(
