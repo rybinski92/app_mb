@@ -92,7 +92,7 @@ class _OApkScreenState extends State<OApkScreen> {
               children: [
                 // Tekst informacyjny
                 const Text(
-                  "Zawody, które zostały dodane pojawią się w ciągu 1-2 dni.\n\n"
+                  "Baza z zawodami odświeżana raz w tygodniu.\n\n"
                   "Jeśli widzisz błąd, masz propozycję współpracy lub chcesz zostać Partnerem aplikacji, "
                   "skontaktuj się z nami:\n\n",
                   textAlign: TextAlign.center,

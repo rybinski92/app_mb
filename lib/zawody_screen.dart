@@ -562,7 +562,7 @@ class _ZawodyScreenState extends State<ZawodyScreen> {
       body: Center(
         child: ConstrainedBox(
           constraints: const BoxConstraints(
-            maxWidth: 700, // Ograniczamy szerokość formularza
+            maxWidth: 900, // Ograniczamy szerokość formularza
           ),
           child: Column(
             children: [

@@ -40,7 +40,7 @@ class RecommendedZawodyScreen extends StatelessWidget {
                   "Jeśli chcesz, aby Twoje zawody były wyświetlane na stronie głównej "
                   "w sekcji Polecane zawody, wyślij do nas maila z informacjami: "
                   "nazwa zawodów, data, miejsce, województwo, link do strony zawodów. "
-                  "Dodanie zawodów do tej sekcji wiąże się z opłatą, którą podamy w odpowiedzi na mail.",
+                 "Po ustaleniu warunków zawody zostaną dodane.",
                   textAlign: TextAlign.center,
                   style: TextStyle(fontSize: 15),
                 ),

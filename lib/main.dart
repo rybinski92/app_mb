@@ -289,7 +289,7 @@ class _HomePageState extends State<HomePage> {
               child: Center(
                 child: ConstrainedBox(
                   constraints: const BoxConstraints(
-                    maxWidth: 700,
+                    maxWidth: 900,
                   ),
                   child: ListView.builder(
                     padding: const EdgeInsets.symmetric(

@@ -3,7 +3,7 @@
     "short_name": "Mój bieg",
     "start_url": ".",
     "display": "standalone",
-    "background_color": "#0175C2",
+    "background_color": "#FFFFFF",
     "theme_color": "#FF6600",
     "description": "Mój bieg - aplikacja i kalendarz biegowy. Sprawdź daty zawodów, tempo biegu i trzymamy kciuki za Twoje wyniki!",
     "orientation": "portrait-primary",
