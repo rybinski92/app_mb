@@ -559,159 +559,154 @@ class _ZawodyScreenState extends State<ZawodyScreen> {
         ),
       ),
       
-      body: Center(
+body: Center(
+  child: Column(
+    children: [
+      if (_pokazFiltry)
+        ConstrainedBox(
+          constraints: const BoxConstraints(
+            maxWidth: 700, // Ogranicz szerokość filtrów do 400px
+          ),
+          child: Padding(
+            padding: EdgeInsets.all(8.0 * scaleNotifier.scale),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                TextFormField(
+                  readOnly: true,
+                  decoration: InputDecoration(
+                    labelText: "Wybierz województwa",
+                    suffixIcon: const Icon(Icons.arrow_drop_down),
+                  ),
+                  controller: TextEditingController(
+                    text: wybraneWojewodztwa.join(", "),
+                  ),
+                  onTap: _wybierzWojewodztwa,
+                ),
+                SizedBox(height: 10 * scaleNotifier.scale),
+                Row(
+                  children: [
+                    Expanded(
+                      child: DropdownButtonFormField<String>(
+                        decoration: const InputDecoration(
+                            labelText: "Wybierz miesiąc"),
+                        value: wybranyMiesiac,
+                        items: miesiace.map((mies) {
+                          return DropdownMenuItem(
+                            value: mies,
+                            child: Text(
+                              mies,
+                              style: TextStyle(
+                                fontSize: 16,
+                              ),
+                            ),
+                          );
+                        }).toList(),
+                        onChanged: (value) {
+                          setState(() {
+                            wybranyMiesiac = value!;
+                          });
+                        },
+                      ),
+                    ),
+                    SizedBox(width: 10 * scaleNotifier.scale),
+                    Expanded(
+                      child: DropdownButtonFormField<String>(
+                        decoration: const InputDecoration(
+                            labelText: "Typ zawodów"),
+                        value: wybranyTypZawodow,
+                        items: ["Wszystkie", "Górskie"].map((typ) {
+                          return DropdownMenuItem(
+                            value: typ,
+                            child: Text(
+                              typ,
+                              style: TextStyle(
+                                fontSize: 16,
+                              ),
+                            ),
+                          );
+                        }).toList(),
+                        onChanged: (value) {
+                          setState(() {
+                            wybranyTypZawodow = value;
+                          });
+                        },
+                      ),
+                    ),
+                  ],
+                ),
+                SizedBox(height: 10 * scaleNotifier.scale),
+                Wrap(
+                  spacing: 1.0 * scaleNotifier.scale,
+                  children: [
+                    ...dystanseOpcje.map((dystans) {
+                      return FilterChip(
+                        label: Text(
+                          dystans,
+                          style: TextStyle(
+                            fontSize: 14 * scaleNotifier.scale,
+                          ),
+                        ),
+                        selected: wybraneDystanse.contains(dystans),
+                        onSelected: (isSelected) {
+                          setState(() {
+                            if (isSelected) {
+                              wybraneDystanse.add(dystans);
+                            } else {
+                              wybraneDystanse.remove(dystans);
+                            }
+                          });
+                        },
+                      );
+                    }).toList(),
+                  ],
+                ),
+              ],
+            ),
+          ),
+        ),
+      Expanded(
         child: ConstrainedBox(
           constraints: const BoxConstraints(
-            maxWidth: 900, // Ograniczamy szerokość formularza
+            maxWidth: 1200, // Ogranicz szerokość listy zawodów do 900px
           ),
-          child: Column(
-            children: [
-              if (_pokazFiltry) // Pokazujemy filtry tylko, jeśli _pokazFiltry == true
-                Padding(
-                  padding: EdgeInsets.all(8.0 * scaleNotifier.scale),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      TextFormField(
-                        readOnly: true,
-                        decoration: InputDecoration(
-                          labelText: "Wybierz województwa",
-                          suffixIcon: const Icon(Icons.arrow_drop_down),
-                        ),
-                        controller: TextEditingController(
-                          text: wybraneWojewodztwa.join(", "),
-                        ),
-                        onTap: _wybierzWojewodztwa,
-                      ),
-                      SizedBox(
-                          height:
-                              10 * scaleNotifier.scale), // Skalowanie odstępu
-                      Row(
-                        children: [
-                          Expanded(
-                            child: DropdownButtonFormField<String>(
-                              decoration: const InputDecoration(
-                                  labelText: "Wybierz miesiąc"),
-                              value: wybranyMiesiac,
-                              items: miesiace.map((mies) {
-                                return DropdownMenuItem(
-                                  value: mies,
-                                  child: Text(
-                                    mies,
-                                    style: TextStyle(
-                                      fontSize: 16, // Skalowanie czcionki
-                                    ),
-                                  ),
-                                );
-                              }).toList(),
-                              onChanged: (value) {
-                                setState(() {
-                                  wybranyMiesiac = value!;
-                                });
-                              },
-                            ),
-                          ),
-                          SizedBox(width: 10 * scaleNotifier.scale),
-                          Expanded(
-                            child: DropdownButtonFormField<String>(
-                              decoration: const InputDecoration(
-                                  labelText: "Typ zawodów"),
-                              value: wybranyTypZawodow,
-                              items: ["Wszystkie", "Górskie"].map((typ) {
-                                return DropdownMenuItem(
-                                  value: typ,
-                                  child: Text(
-                                    typ,
-                                    style: TextStyle(
-                                      fontSize: 16, // Skalowanie czcionki
-                                    ),
-                                  ),
-                                );
-                              }).toList(),
-                              onChanged: (value) {
-                                setState(() {
-                                  wybranyTypZawodow = value;
-                                });
-                              },
-                            ),
-                          ),
-                        ],
-                      ),
-                      SizedBox(height: 10 * scaleNotifier.scale),
-                      // Filtr dystansów
-                      Wrap(
-                        spacing: 1.0 *
-                            scaleNotifier.scale, // Odstępy między elementami
-                        children: [
-                          // Użycie spread operator (...) do rozpakowania listy elementów
-                          ...dystanseOpcje.map((dystans) {
-                            return FilterChip(
-                              label: Text(
-                                dystans,
-                                style: TextStyle(
-                                  fontSize: 14 *
-                                      scaleNotifier
-                                          .scale, // Skalowanie czcionki
-                                ),
-                              ),
-                              selected: wybraneDystanse.contains(dystans),
-                              onSelected: (isSelected) {
-                                setState(() {
-                                  if (isSelected) {
-                                    wybraneDystanse.add(dystans);
-                                  } else {
-                                    wybraneDystanse.remove(dystans);
-                                  }
-                                });
-                              },
-                            );
-                          }).toList(),
-                        ],
-                      ),
-                    ],
+          child: ListView.builder(
+            itemCount: filtrowaneZawody.length,
+            itemBuilder: (context, index) {
+              final zawod = filtrowaneZawody[index];
+              return Card(
+                color: zawod["gorskie"] == '1'
+                    ? Colors.green[300]
+                    : Colors.white,
+                child: ListTile(
+                  title: Text(
+                    zawod["nazwa"] ?? '',
+                    style: TextStyle(
+                      fontSize: 18 * scaleNotifier.scale,
+                    ),
                   ),
+                  subtitle: Text(
+                    "Data: ${zawod["dataPrzetworzona"]}\nMiejsce: ${zawod["miejsce"]}\nDystanse: ${zawod["dystanse"]}",
+                    style: TextStyle(
+                      fontSize: 14 * scaleNotifier.scale,
+                    ),
+                  ),
+                  trailing: Text(
+                    zawod["wojewodztwo"] ?? '',
+                    style: TextStyle(
+                      fontSize: 14 * scaleNotifier.scale,
+                    ),
+                  ),
+                  onTap: () => _otworzGoogle(zawod["nazwa"] ?? ''),
                 ),
-              Expanded(
-                child: ListView.builder(
-                  itemCount: filtrowaneZawody.length,
-                  itemBuilder: (context, index) {
-                    final zawod = filtrowaneZawody[index];
-                    return Card(
-                      color: zawod["gorskie"] == '1'
-                          ? Colors.green[300]
-                          : Colors.white,
-                      child: ListTile(
-                        title: Text(
-                          zawod["nazwa"] ?? '',
-                          style: TextStyle(
-                            fontSize:
-                                18 * scaleNotifier.scale, // Skalowanie czcionki
-                          ),
-                        ),
-                        subtitle: Text(
-                          "Data: ${zawod["dataPrzetworzona"]}\nMiejsce: ${zawod["miejsce"]}\nDystanse: ${zawod["dystanse"]}",
-                          style: TextStyle(
-                            fontSize:
-                                14 * scaleNotifier.scale, // Skalowanie czcionki
-                          ),
-                        ),
-                        trailing: Text(
-                          zawod["wojewodztwo"] ?? '',
-                          style: TextStyle(
-                            fontSize:
-                                14 * scaleNotifier.scale, // Skalowanie czcionki
-                          ),
-                        ),
-                        onTap: () => _otworzGoogle(zawod["nazwa"] ?? ''),
-                      ),
-                    );
-                  },
-                ),
-              ),
-            ],
+              );
+            },
           ),
         ),
       ),
+    ],
+  ),
+),
     );
   }
 }
