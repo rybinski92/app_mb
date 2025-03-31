@@ -6,14 +6,18 @@ import 'package:app_kb/partnerzy_screen.dart';
 import 'package:app_kb/dodaj_zawody_screen.dart';
 import 'package:app_kb/recommended_zawody.dart';
 import 'package:url_launcher/url_launcher.dart';
-import 'package:http/http.dart' as http;
-import 'dart:convert';
+// import 'package:http/http.dart' as http;
+// import 'dart:convert';
 import 'config.dart';
 import 'package:provider/provider.dart';
 import 'scalowanie.dart'; // Zaimportuj plik z ScaleNotifier
-import 'package:shared_preferences/shared_preferences.dart';
-import 'package:crypto/crypto.dart';
+// import 'package:shared_preferences/shared_preferences.dart';
+// import 'package:crypto/crypto.dart';
 import 'package:flutter/foundation.dart';
+import 'package:flutter/services.dart' show rootBundle;
+import 'package:excel/excel.dart';
+import 'dart:typed_data';
+
 
 void main() {
   runApp(
@@ -49,161 +53,86 @@ class HomePage extends StatefulWidget {
 
 class _HomePageState extends State<HomePage> {
   List<Map<String, String>> polecaneZawody = [];
-  final String apiUrl =
-      "https://api.appsheet.com/api/v2/apps/5408db07-71e1-4309-a30a-dc9c7c1ae7a3/tables/Arkusz1/records";
-  bool _isFetching = false;
+  // bool _isLoading = false;
 
-  @override
-  void initState() {
-    super.initState();
-    _initData();
-  }
+@override
+void initState() {
+  super.initState();
+  _loadLocalExcelData();
+}
 
-  Future<void> _initData() async {
-    // Najpierw ładujemy dane lokalne
-    await _loadLocalData();
-    // Potem sprawdzamy aktualizacje
-    await _checkAndFetchData();
-  }
 
-  Future<void> _loadLocalData() async {
-    final prefs = await SharedPreferences.getInstance();
-    final storedData = prefs.getString('polecaneZawody');
 
-    if (storedData != null) {
-      setState(() {
-        polecaneZawody = List<Map<String, String>>.from(
-            jsonDecode(storedData).map((e) => Map<String, String>.from(e)));
-      });
-      print("✅ Załadowano lokalne dane (${polecaneZawody.length} zawodów)");
-    }
-  }
+ 
+Future<void> _loadLocalExcelData() async {
+  try {
+    ByteData data = await rootBundle.load('pliki_bazy/polecane.xlsx');
+    Uint8List bytes = data.buffer.asUint8List();
+    var excel = Excel.decodeBytes(bytes);
 
-  Future<void> _checkAndFetchData() async {
-    if (_isFetching) return;
-    _isFetching = true;
+    List<Map<String, String>> newPolecaneZawody = [];
 
-    try {
-      final prefs = await SharedPreferences.getInstance();
-      final response = await http.post(
-        Uri.parse(apiUrl),
-        headers: {
-          "Accept": "application/json",
-          "Content-Type": "application/json; charset=utf-8",
-          "ApplicationAccessKey": Config.apiKey2,
-        },
-        body: jsonEncode({
-          "Action": "Find",
-          "Properties": {"Locale": "pl-PL"},
-          "Rows": []
-        }),
-      );
+    for (var table in excel.tables.keys) {
+      var sheet = excel.tables[table];
+      if (sheet == null) continue;
 
-      if (response.statusCode == 200 && response.body.isNotEmpty) {
-        final decodedBody = utf8.decode(response.bodyBytes);
-        final String newHash =
-            sha256.convert(utf8.encode(decodedBody)).toString();
-        final String? oldHash = prefs.getString('polecaneZawodyHash');
+      for (var row in sheet.rows.skip(1)) {
+        String rawDate = row[1]?.value.toString() ?? "";
+        String formattedDate = _formatDate(rawDate); // Używamy nowej funkcji formatującej
 
-        if (oldHash == null || oldHash != newHash) {
-          print("🔄 Wykryto zmiany w danych, pobieram aktualizacje...");
-          await _processAndSaveData(decodedBody, newHash, prefs);
-        } else {
-          print("⏩ Brak zmian w danych, używam lokalnej wersji");
-        }
-      }
-    } catch (e) {
-      print("❌ Błąd podczas sprawdzania aktualizacji: $e");
-    } finally {
-      _isFetching = false;
-    }
-  }
-
-  Future<void> _processAndSaveData(
-      String decodedBody, String newHash, SharedPreferences prefs) async {
-    try {
-      List<dynamic> data = json.decode(decodedBody);
-
-      if (data.isEmpty) {
-        print("⚠ API zwróciło pustą listę zawodów!");
-        return;
-      }
-
-      List<Map<String, String>> newPolecaneZawody = data.map((zawod) {
-        final nazwa =
-            _handlePolishCharacters(zawod["nazwa"] ?? zawod["Nazwa"] ?? "");
-        final rawDate = zawod["data"] ?? zawod["Data"] ?? "";
-        final dystans = zawod["dystans"] ?? zawod["Dystans"] ?? "";
-        final miejsce = zawod["miejsce"] ?? zawod["Miejsce"] ?? "";
-        final wojewodztwo = zawod["wojewodztwo"] ?? zawod["Wojewodztwo"] ?? "";
-        var link = zawod["link"] ?? zawod["Link"] ?? "";
-
-        if (link is String) {
-          try {
-            final linkData = jsonDecode(link);
-            link = linkData["Url"] ?? "";
-          } catch (e) {
-            print("❌ Błąd parsowania linku JSON: $e");
-          }
-        }
-
-        String formattedDate = rawDate;
-        try {
-          final parsedDate = _parseDate(rawDate);
-          if (parsedDate != null) {
-            formattedDate =
-                "${parsedDate.day.toString().padLeft(2, '0')}-${parsedDate.month.toString().padLeft(2, '0')}-${parsedDate.year}";
-          }
-        } catch (e) {
-          print("⚠ Błąd parsowania daty: $rawDate");
-        }
-
-        return {
-          "nazwa": nazwa.toString(),
+        newPolecaneZawody.add({
+          "nazwa": row[0]?.value.toString() ?? "",
           "data": formattedDate,
-          "dystans": dystans.toString(),
-          "miejsce": miejsce.toString(),
-          "wojewodztwo": wojewodztwo.toString(),
-          "link": link.toString(),
-        };
-      }).toList();
-
-      await prefs.setString('polecaneZawody', jsonEncode(newPolecaneZawody));
-      await prefs.setString('polecaneZawodyHash', newHash);
-
-      setState(() {
-        polecaneZawody = newPolecaneZawody;
-      });
-
-      print("✅ Zaktualizowano dane (${polecaneZawody.length} zawodów)");
-    } catch (e) {
-      print("❌ Błąd przetwarzania danych: $e");
-    }
-  }
-
-// Funkcja pomocnicza do parsowania daty w formacie MM/DD/YYYY
-  DateTime? _parseDate(String rawDate) {
-    try {
-      final dateParts = rawDate.split('/');
-      if (dateParts.length == 3) {
-        final month = int.parse(dateParts[0]);
-        final day = int.parse(dateParts[1]);
-        final year = int.parse(dateParts[2]);
-        return DateTime(year, month, day);
+          "dystans": row[2]?.value.toString() ?? "",
+          "miejsce": row[3]?.value.toString() ?? "",
+          "wojewodztwo": row[4]?.value.toString() ?? "",
+          "link": row[5]?.value.toString() ?? "",
+        });
       }
-    } catch (e) {
-      print("❌ Błąd parsowania daty: $rawDate");
     }
-    return null;
-  }
 
-  String _handlePolishCharacters(String text) {
-    // Obsługuje polskie znaki: jeśli nie działają, można spróbować ręcznie konwertować
-    return text.runes.map((rune) {
-      final character = String.fromCharCode(rune);
-      return character;
-    }).join('');
+    setState(() {
+      polecaneZawody = newPolecaneZawody;
+    });
+
+    print("✅ Załadowano zawody z pliku Excel (${polecaneZawody.length})");
+  } catch (e) {
+    print("❌ Błąd odczytu Excela: $e");
   }
+}
+
+// Nowa funkcja do formatowania daty
+String _formatDate(String rawDate) {
+  try {
+    // Najpierw spróbuj parsować jako MM/DD/YYYY
+    final dateParts = rawDate.split('/');
+    if (dateParts.length == 3) {
+      final month = int.parse(dateParts[0]);
+      final day = int.parse(dateParts[1]);
+      final year = int.parse(dateParts[2]);
+      return "${day.toString().padLeft(2, '0')}-${month.toString().padLeft(2, '0')}-$year";
+    }
+    
+    // Jeśli to nie zadziała, spróbuj parsować jako DateTime (np. jeśli Excel zapisał jako DateTime)
+    DateTime? parsedDate = DateTime.tryParse(rawDate);
+    if (parsedDate != null) {
+      return "${parsedDate.day.toString().padLeft(2, '0')}-${parsedDate.month.toString().padLeft(2, '0')}-${parsedDate.year}";
+    }
+  } catch (e) {
+    print("❌ Błąd formatowania daty: $rawDate");
+  }
+  
+  // Jeśli nic nie zadziała, zwróć oryginalną wartość
+  return rawDate;
+}
+
+//   String _handlePolishCharacters(String text) {
+//     // Obsługuje polskie znaki: jeśli nie działają, można spróbować ręcznie konwertować
+//     return text.runes.map((rune) {
+//       final character = String.fromCharCode(rune);
+//       return character;
+//     }).join('');
+//   }
 
   @override
   Widget build(BuildContext context) {

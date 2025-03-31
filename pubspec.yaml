@@ -80,7 +80,7 @@ flutter:
     - zdjecia/logo/logo_kb2.jpg
     - zdjecia/logo/logo3_kb4.png
     - pliki_bazy/zawody.xlsx
-    - pliki_bazy/zawody2.csv
+    # - pliki_bazy/zawody2.csv
     # - zdjecia/partnerzy/sportiva.jpg
     - zdjecia/partnerzy/gmoto.jpg
     - zdjecia/partnerzy/zen_com.jpg
