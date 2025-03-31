@@ -41882,7 +41882,7 @@ yF(){var s=0,r=A.O(t.H),q=1,p,o=this,n,m,l,k,j,i,h,g,f,e,d,c,b,a,a0,a1,a2,a3,a4,
 var $async$yF=A.P(function(a9,b0){if(a9===1){p=b0
 s=q}while(true)switch(s){case 0:q=3
 s=6
-return A.U($.y7().k5(0,"pliki_bazy/polecane.xlsx"),$async$yF)
+return A.U($.y7().k5(0,"assets/pliki_bazy/polecane.xlsx"),$async$yF)
 case 6:n=b0
 m=J.n0(J.aD3(n))
 l=A.aJg(new A.Si().W5(m))
@@ -42167,7 +42167,7 @@ yD(){var s=0,r=A.O(t.H),q=1,p,o=this,n,m,l,k,j,i,h,g,f,e,d,c,b,a,a0,a1,a2,a3,a4,
 var $async$yD=A.P(function(c3,c4){if(c3===1){p=c4
 s=q}while(true)switch(s){case 0:q=3
 s=6
-return A.U($.y7().k5(0,"pliki_bazy/zawody.xlsx"),$async$yD)
+return A.U($.y7().k5(0,"assets/pliki_bazy/zawody.xlsx"),$async$yD)
 case 6:n=c4
 m=J.n0(J.aD3(n))
 l=A.aJg(new A.Si().W5(m))

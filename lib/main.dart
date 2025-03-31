@@ -66,7 +66,7 @@ void initState() {
  
 Future<void> _loadLocalExcelData() async {
   try {
-    ByteData data = await rootBundle.load('pliki_bazy/polecane.xlsx');
+    ByteData data = await rootBundle.load('assets/pliki_bazy/polecane.xlsx');
     Uint8List bytes = data.buffer.asUint8List();
     var excel = Excel.decodeBytes(bytes);
 
