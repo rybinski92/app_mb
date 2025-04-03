@@ -18,7 +18,6 @@ import 'package:flutter/services.dart' show rootBundle;
 import 'package:excel/excel.dart';
 import 'dart:typed_data';
 
-
 void main() {
   runApp(
     ChangeNotifierProvider(
@@ -55,76 +54,87 @@ class _HomePageState extends State<HomePage> {
   List<Map<String, String>> polecaneZawody = [];
   // bool _isLoading = false;
 
-@override
-void initState() {
-  super.initState();
-  _loadLocalExcelData();
-}
+  @override
+  void initState() {
+    super.initState();
+    _loadLocalExcelData();
+  }
 
+  Future<void> _loadLocalExcelData() async {
+    try {
+      // 1. Czyść listę PRZED ładowaniem (feedback wizualny)
+      setState(() {
+        polecaneZawody = [];
+      });
 
+      // 2. Reszta istniejącego kodu ładowania...
+      ByteData data = await rootBundle.load('pliki_bazy/polecane.xlsx');
+      Uint8List bytes = data.buffer.asUint8List();
+      var excel = Excel.decodeBytes(bytes);
 
- 
-Future<void> _loadLocalExcelData() async {
-  try {
-    ByteData data = await rootBundle.load('assets/pliki_bazy/polecane.xlsx');
-    Uint8List bytes = data.buffer.asUint8List();
-    var excel = Excel.decodeBytes(bytes);
+      List<Map<String, String>> newPolecaneZawody = [];
 
-    List<Map<String, String>> newPolecaneZawody = [];
+      for (var table in excel.tables.keys) {
+        var sheet = excel.tables[table];
+        if (sheet == null) continue;
 
-    for (var table in excel.tables.keys) {
-      var sheet = excel.tables[table];
-      if (sheet == null) continue;
+        for (var row in sheet.rows.skip(1)) {
+          String rawDate = row[1]?.value.toString() ?? "";
+          String formattedDate =
+              _formatDate(rawDate); // Używamy nowej funkcji formatującej
 
-      for (var row in sheet.rows.skip(1)) {
-        String rawDate = row[1]?.value.toString() ?? "";
-        String formattedDate = _formatDate(rawDate); // Używamy nowej funkcji formatującej
+          newPolecaneZawody.add({
+            "nazwa": row[0]?.value.toString() ?? "",
+            "data": formattedDate,
+            "dystans": row[2]?.value.toString() ?? "",
+            "miejsce": row[3]?.value.toString() ?? "",
+            "wojewodztwo": row[4]?.value.toString() ?? "",
+            "link": row[5]?.value.toString() ?? "",
+          });
+        }
+      }
 
-        newPolecaneZawody.add({
-          "nazwa": row[0]?.value.toString() ?? "",
-          "data": formattedDate,
-          "dystans": row[2]?.value.toString() ?? "",
-          "miejsce": row[3]?.value.toString() ?? "",
-          "wojewodztwo": row[4]?.value.toString() ?? "",
-          "link": row[5]?.value.toString() ?? "",
+      if (mounted) {
+        setState(() {
+          polecaneZawody = newPolecaneZawody;
         });
       }
+
+      print("✅ Załadowano zawody z pliku Excel (${polecaneZawody.length})");
+    } catch (e) {
+      print("❌ Błąd ładowania: $e");
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text("Nie udało się odświeżyć danych")),
+        );
+      }
     }
-
-    setState(() {
-      polecaneZawody = newPolecaneZawody;
-    });
-
-    print("✅ Załadowano zawody z pliku Excel (${polecaneZawody.length})");
-  } catch (e) {
-    print("❌ Błąd odczytu Excela: $e");
   }
-}
 
 // Nowa funkcja do formatowania daty
-String _formatDate(String rawDate) {
-  try {
-    // Najpierw spróbuj parsować jako MM/DD/YYYY
-    final dateParts = rawDate.split('/');
-    if (dateParts.length == 3) {
-      final month = int.parse(dateParts[0]);
-      final day = int.parse(dateParts[1]);
-      final year = int.parse(dateParts[2]);
-      return "${day.toString().padLeft(2, '0')}-${month.toString().padLeft(2, '0')}-$year";
+  String _formatDate(String rawDate) {
+    try {
+      // Najpierw spróbuj parsować jako MM/DD/YYYY
+      final dateParts = rawDate.split('/');
+      if (dateParts.length == 3) {
+        final month = int.parse(dateParts[0]);
+        final day = int.parse(dateParts[1]);
+        final year = int.parse(dateParts[2]);
+        return "${day.toString().padLeft(2, '0')}-${month.toString().padLeft(2, '0')}-$year";
+      }
+
+      // Jeśli to nie zadziała, spróbuj parsować jako DateTime (np. jeśli Excel zapisał jako DateTime)
+      DateTime? parsedDate = DateTime.tryParse(rawDate);
+      if (parsedDate != null) {
+        return "${parsedDate.day.toString().padLeft(2, '0')}-${parsedDate.month.toString().padLeft(2, '0')}-${parsedDate.year}";
+      }
+    } catch (e) {
+      print("❌ Błąd formatowania daty: $rawDate");
     }
-    
-    // Jeśli to nie zadziała, spróbuj parsować jako DateTime (np. jeśli Excel zapisał jako DateTime)
-    DateTime? parsedDate = DateTime.tryParse(rawDate);
-    if (parsedDate != null) {
-      return "${parsedDate.day.toString().padLeft(2, '0')}-${parsedDate.month.toString().padLeft(2, '0')}-${parsedDate.year}";
-    }
-  } catch (e) {
-    print("❌ Błąd formatowania daty: $rawDate");
+
+    // Jeśli nic nie zadziała, zwróć oryginalną wartość
+    return rawDate;
   }
-  
-  // Jeśli nic nie zadziała, zwróć oryginalną wartość
-  return rawDate;
-}
 
 //   String _handlePolishCharacters(String text) {
 //     // Obsługuje polskie znaki: jeśli nie działają, można spróbować ręcznie konwertować

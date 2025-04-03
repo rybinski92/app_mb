@@ -63,7 +63,7 @@ class _ZawodyScreenState extends State<ZawodyScreen> {
   Future<void> _loadLocalExcelData() async {
     try {
       
-      ByteData data = await rootBundle.load('assets/pliki_bazy/zawody.xlsx');
+      ByteData data = await rootBundle.load('pliki_bazy/zawody.xlsx');
       Uint8List bytes = data.buffer.asUint8List();
       var excel = Excel.decodeBytes(bytes);
 
