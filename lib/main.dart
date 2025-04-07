@@ -6,17 +6,16 @@ import 'package:app_kb/partnerzy_screen.dart';
 import 'package:app_kb/dodaj_zawody_screen.dart';
 import 'package:app_kb/recommended_zawody.dart';
 import 'package:url_launcher/url_launcher.dart';
-// import 'package:http/http.dart' as http;
-// import 'dart:convert';
+import 'package:http/http.dart' as http;
+import 'dart:convert';
 import 'config.dart';
 import 'package:provider/provider.dart';
 import 'scalowanie.dart'; // Zaimportuj plik z ScaleNotifier
-// import 'package:shared_preferences/shared_preferences.dart';
-// import 'package:crypto/crypto.dart';
-import 'package:flutter/foundation.dart';
-import 'package:flutter/services.dart' show rootBundle;
-import 'package:excel/excel.dart';
-import 'dart:typed_data';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'package:crypto/crypto.dart';
+
+
+
 
 void main() {
   runApp(
@@ -50,113 +49,159 @@ class HomePage extends StatefulWidget {
   _HomePageState createState() => _HomePageState();
 }
 
-class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
+class _HomePageState extends State<HomePage> {
   List<Map<String, String>> polecaneZawody = [];
+  final String apiUrl = "https://api.appsheet.com/api/v2/apps/5408db07-71e1-4309-a30a-dc9c7c1ae7a3/tables/Arkusz1/records";
+  bool _isFetching = false;
 
   @override
   void initState() {
     super.initState();
-    WidgetsBinding.instance.addObserver(this);
-    _loadLocalExcelData();
+    _initData();
   }
 
-  @override
-  void dispose() {
-    WidgetsBinding.instance.removeObserver(this);
-    super.dispose();
+  Future<void> _initData() async {
+    // Najpierw ładujemy dane lokalne
+    await _loadLocalData();
+    // Potem sprawdzamy aktualizacje
+    await _checkAndFetchData();
   }
 
-  // Ten fragment wykona się za każdym razem, gdy aplikacja wraca na ekran
-  @override
-  void didChangeAppLifecycleState(AppLifecycleState state) {
-    if (state == AppLifecycleState.resumed) {
-      _loadLocalExcelData(); // automatyczne odświeżenie
+  Future<void> _loadLocalData() async {
+    final prefs = await SharedPreferences.getInstance();
+    final storedData = prefs.getString('polecaneZawody');
+    
+    if (storedData != null) {
+      setState(() {
+        polecaneZawody = List<Map<String, String>>.from(
+            jsonDecode(storedData).map((e) => Map<String, String>.from(e)));
+      });
+      print("✅ Załadowano lokalne dane (${polecaneZawody.length} zawodów)");
     }
   }
 
-  Future<void> _loadLocalExcelData() async {
+  Future<void> _checkAndFetchData() async {
+    if (_isFetching) return;
+    _isFetching = true;
+
     try {
-      // 1. Czyść listę PRZED ładowaniem (feedback wizualny)
-      setState(() {
-        polecaneZawody = [];
-      });
+      final prefs = await SharedPreferences.getInstance();
+      final response = await http.post(
+        Uri.parse(apiUrl),
+        headers: {
+          "Accept": "application/json",
+          "Content-Type": "application/json; charset=utf-8",
+          "ApplicationAccessKey": Config.apiKey2,
+        },
+        body: jsonEncode({
+          "Action": "Find",
+          "Properties": {"Locale": "pl-PL"},
+          "Rows": []
+        }),
+      );
 
-      // 2. Reszta istniejącego kodu ładowania...
-      ByteData data = await rootBundle.load('pliki_bazy/polecane.xlsx');
-      Uint8List bytes = data.buffer.asUint8List();
-      var excel = Excel.decodeBytes(bytes);
+      if (response.statusCode == 200 && response.body.isNotEmpty) {
+        final decodedBody = utf8.decode(response.bodyBytes);
+        final String newHash = sha256.convert(utf8.encode(decodedBody)).toString();
+        final String? oldHash = prefs.getString('polecaneZawodyHash');
 
-      List<Map<String, String>> newPolecaneZawody = [];
-
-      for (var table in excel.tables.keys) {
-        var sheet = excel.tables[table];
-        if (sheet == null) continue;
-
-        for (var row in sheet.rows.skip(1)) {
-          String rawDate = row[1]?.value.toString() ?? "";
-          String formattedDate =
-              _formatDate(rawDate); // Używamy nowej funkcji formatującej
-
-          newPolecaneZawody.add({
-            "nazwa": row[0]?.value.toString() ?? "",
-            "data": formattedDate,
-            "dystans": row[2]?.value.toString() ?? "",
-            "miejsce": row[3]?.value.toString() ?? "",
-            "wojewodztwo": row[4]?.value.toString() ?? "",
-            "link": row[5]?.value.toString() ?? "",
-          });
+        if (oldHash == null || oldHash != newHash) {
+          print("🔄 Wykryto zmiany w danych, pobieram aktualizacje...");
+          await _processAndSaveData(decodedBody, newHash, prefs);
+        } else {
+          print("⏩ Brak zmian w danych, używam lokalnej wersji");
         }
       }
-
-      if (mounted) {
-        setState(() {
-          polecaneZawody = newPolecaneZawody;
-        });
-      }
-
-      print("✅ Załadowano zawody z pliku Excel (${polecaneZawody.length})");
     } catch (e) {
-      print("❌ Błąd ładowania: $e");
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text("Nie udało się odświeżyć danych")),
-        );
-      }
+      print("❌ Błąd podczas sprawdzania aktualizacji: $e");
+    } finally {
+      _isFetching = false;
     }
   }
 
-// Nowa funkcja do formatowania daty
-  String _formatDate(String rawDate) {
+  Future<void> _processAndSaveData(String decodedBody, String newHash, SharedPreferences prefs) async {
     try {
-      // Najpierw spróbuj parsować jako MM/DD/YYYY
+      List<dynamic> data = json.decode(decodedBody);
+      
+      if (data.isEmpty) {
+        print("⚠ API zwróciło pustą listę zawodów!");
+        return;
+      }
+
+      List<Map<String, String>> newPolecaneZawody = data.map((zawod) {
+        final nazwa = _handlePolishCharacters(zawod["nazwa"] ?? zawod["Nazwa"] ?? "");
+        final rawDate = zawod["data"] ?? zawod["Data"] ?? "";
+        final dystans = zawod["dystans"] ?? zawod["Dystans"] ?? "";
+        final miejsce = zawod["miejsce"] ?? zawod["Miejsce"] ?? "";
+        final wojewodztwo = zawod["wojewodztwo"] ?? zawod["Wojewodztwo"] ?? "";
+        var link = zawod["link"] ?? zawod["Link"] ?? "";
+
+        if (link is String) {
+          try {
+            final linkData = jsonDecode(link);
+            link = linkData["Url"] ?? "";
+          } catch (e) {
+            print("❌ Błąd parsowania linku JSON: $e");
+          }
+        }
+
+        String formattedDate = rawDate;
+        try {
+          final parsedDate = _parseDate(rawDate);
+          if (parsedDate != null) {
+            formattedDate =
+                "${parsedDate.day.toString().padLeft(2, '0')}-${parsedDate.month.toString().padLeft(2, '0')}-${parsedDate.year}";
+          }
+        } catch (e) {
+          print("⚠ Błąd parsowania daty: $rawDate");
+        }
+
+        return {
+          "nazwa": nazwa.toString(),
+          "data": formattedDate,
+          "dystans": dystans.toString(),
+          "miejsce": miejsce.toString(),
+          "wojewodztwo": wojewodztwo.toString(),
+          "link": link.toString(),
+        };
+      }).toList();
+
+      await prefs.setString('polecaneZawody', jsonEncode(newPolecaneZawody));
+      await prefs.setString('polecaneZawodyHash', newHash);
+
+      setState(() {
+        polecaneZawody = newPolecaneZawody;
+      });
+
+      print("✅ Zaktualizowano dane (${polecaneZawody.length} zawodów)");
+    } catch (e) {
+      print("❌ Błąd przetwarzania danych: $e");
+    }
+  }
+
+// Funkcja pomocnicza do parsowania daty w formacie MM/DD/YYYY
+  DateTime? _parseDate(String rawDate) {
+    try {
       final dateParts = rawDate.split('/');
       if (dateParts.length == 3) {
         final month = int.parse(dateParts[0]);
         final day = int.parse(dateParts[1]);
         final year = int.parse(dateParts[2]);
-        return "${day.toString().padLeft(2, '0')}-${month.toString().padLeft(2, '0')}-$year";
-      }
-
-      // Jeśli to nie zadziała, spróbuj parsować jako DateTime (np. jeśli Excel zapisał jako DateTime)
-      DateTime? parsedDate = DateTime.tryParse(rawDate);
-      if (parsedDate != null) {
-        return "${parsedDate.day.toString().padLeft(2, '0')}-${parsedDate.month.toString().padLeft(2, '0')}-${parsedDate.year}";
+        return DateTime(year, month, day);
       }
     } catch (e) {
-      print("❌ Błąd formatowania daty: $rawDate");
+      print("❌ Błąd parsowania daty: $rawDate");
     }
-
-    // Jeśli nic nie zadziała, zwróć oryginalną wartość
-    return rawDate;
+    return null;
   }
 
-//   String _handlePolishCharacters(String text) {
-//     // Obsługuje polskie znaki: jeśli nie działają, można spróbować ręcznie konwertować
-//     return text.runes.map((rune) {
-//       final character = String.fromCharCode(rune);
-//       return character;
-//     }).join('');
-//   }
+  String _handlePolishCharacters(String text) {
+    // Obsługuje polskie znaki: jeśli nie działają, można spróbować ręcznie konwertować
+    return text.runes.map((rune) {
+      final character = String.fromCharCode(rune);
+      return character;
+    }).join('');
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -223,15 +268,8 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
                         builder: (context) => const RecommendedZawodyScreen()),
                   );
                 },
-                child: Text(
-                  "Polecane zawody",
-                  style: TextStyle(
-                    fontSize: (MediaQuery.of(context).size.width > 500
-                            ? 500
-                            : MediaQuery.of(context).size.width) *
-                        0.035,
-                  ),
-                ),
+                child: Text("Polecane zawody",
+                    style: TextStyle(fontSize: 15 * scaleNotifier.scale)),
               ),
             ),
 
@@ -242,7 +280,7 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
               child: Center(
                 child: ConstrainedBox(
                   constraints: const BoxConstraints(
-                    maxWidth: 900,
+                    maxWidth: 700,
                   ),
                   child: ListView.builder(
                     padding: const EdgeInsets.symmetric(
@@ -258,84 +296,60 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
             ),
 
             // Układ przycisków na dole
-            Center(
-              child: ConstrainedBox(
-                constraints: const BoxConstraints(
-                    maxWidth: 500), // Maksymalna szerokość na dużych ekranach
-                child: Padding(
-                  padding:
-                      const EdgeInsets.symmetric(vertical: 20, horizontal: 25),
-                  child: Column(
-                    mainAxisSize: MainAxisSize
-                        .min, // Ważne dla poprawnego działania ConstrainedBox
+            Padding(
+              padding: EdgeInsets.only(
+                  top: 15 * scaleNotifier.scale,
+                  bottom: 15.0 * scaleNotifier.scale),
+              child: Column(
+                children: [
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      // Pierwszy rząd przycisków
-                      Row(
-                        children: [
-                          Expanded(
-                            child: _buildAutoScaleButton(
-                                context, "Lista zawodów", () {
-                              Navigator.push(
-                                  context,
-                                  MaterialPageRoute(
-                                      builder: (context) =>
-                                          const ZawodyScreen()));
-                            }),
-                          ),
-                          const SizedBox(width: 15),
-                          Expanded(
-                            child: _buildAutoScaleButton(
-                                context, "Dodaj zawody", () {
-                              Navigator.push(
-                                  context,
-                                  MaterialPageRoute(
-                                      builder: (context) =>
-                                          const DodajZawodyScreen()));
-                            }),
-                          ),
-                        ],
-                      ),
-                      const SizedBox(height: 15),
-                      // Drugi rząd przycisków
-                      Row(
-                        children: [
-                          Expanded(
-                            child:
-                                _buildAutoScaleButton(context, "Partnerzy", () {
-                              Navigator.push(
-                                  context,
-                                  MaterialPageRoute(
-                                      builder: (context) =>
-                                          const PartnerzyScreen()));
-                            }),
-                          ),
-                          const SizedBox(width: 10),
-                          Expanded(
-                            child: _buildAutoScaleButton(context, "Kalkulator",
-                                () {
-                              Navigator.push(
-                                  context,
-                                  MaterialPageRoute(
-                                      builder: (context) =>
-                                          const KalkulatorScreen()));
-                            }),
-                          ),
-                          const SizedBox(width: 10),
-                          Expanded(
-                            flex: 1,
-                            child: _buildAutoScaleButton(context, "📩", () {
-                              Navigator.push(
-                                  context,
-                                  MaterialPageRoute(
-                                      builder: (context) =>
-                                          const OApkScreen()));
-                            }),
-                          ),
-                        ],
-                      ),
+                      _buildButton(context, "Lista zawodów", () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                              builder: (context) => const ZawodyScreen()),
+                        );
+                      }),
+                      SizedBox(width: 20 * scaleNotifier.scale),
+                      _buildButton(context, "Dodaj zawody", () {
+                        Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                                builder: (context) =>
+                                    const DodajZawodyScreen()));
+                      }),
                     ],
                   ),
-                ),
+                  SizedBox(height: 10 * scaleNotifier.scale),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      _buildButton(context, "Partnerzy", () {
+                        Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                                builder: (context) => const PartnerzyScreen()));
+                      }),
+                      SizedBox(width: 13 * scaleNotifier.scale),
+                      _buildButton(context, "Kalkulator", () {
+                        Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                                builder: (context) =>
+                                    const KalkulatorScreen()));
+                      }),
+                      SizedBox(width: 11 * scaleNotifier.scale),
+                      _buildButton(context, "📩", () {
+                        Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                                builder: (context) => const OApkScreen()));
+                      }),
+                    ],
+                  ),
+                ],
               ),
             ),
           ],
@@ -344,30 +358,21 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
     );
   }
 
-// Funkcja do budowania przycisków z auto-skalingiem
-  Widget _buildAutoScaleButton(
+  Widget _buildButton(
       BuildContext context, String text, VoidCallback onPressed) {
-    final screenWidth = MediaQuery.of(context).size.width;
-    // Ustalamy maksymalną szerokość do skalowania - nie więcej niż 700px
-    final scalingWidth = screenWidth > 500 ? 500 : screenWidth;
-
+    final scaleNotifier = Provider.of<ScaleNotifier>(context);
     return ElevatedButton(
-      onPressed: onPressed,
       style: ElevatedButton.styleFrom(
         backgroundColor: Colors.white,
         foregroundColor: Colors.orange,
-        padding: const EdgeInsets.symmetric(vertical: 12),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+        padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
       ),
-      child: FittedBox(
-        fit: BoxFit.scaleDown,
-        child: Text(
-          text,
+      onPressed: onPressed,
+      child: Text(text,
           style: TextStyle(
-            // Skalujemy tylko do 700px szerokości
-            fontSize: scalingWidth * 0.035,
-          ),
-        ),
-      ),
+            fontSize: 15 * scaleNotifier.scale,
+          )),
     );
   }
 
