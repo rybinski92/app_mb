@@ -203,7 +203,7 @@ class _HomePageState extends State<HomePage> {
     }).join('');
   }
 
-  @override
+ @override
   Widget build(BuildContext context) {
     final scaleNotifier = Provider.of<ScaleNotifier>(context);
     return Scaffold(
@@ -268,8 +268,15 @@ class _HomePageState extends State<HomePage> {
                         builder: (context) => const RecommendedZawodyScreen()),
                   );
                 },
-                child: Text("Polecane zawody",
-                    style: TextStyle(fontSize: 15 * scaleNotifier.scale)),
+                child: Text(
+                  "Polecane zawody",
+                  style: TextStyle(
+                    fontSize: (MediaQuery.of(context).size.width > 500
+                            ? 500
+                            : MediaQuery.of(context).size.width) *
+                        0.035,
+                  ),
+                ),
               ),
             ),
 
@@ -280,7 +287,7 @@ class _HomePageState extends State<HomePage> {
               child: Center(
                 child: ConstrainedBox(
                   constraints: const BoxConstraints(
-                    maxWidth: 700,
+                    maxWidth: 900,
                   ),
                   child: ListView.builder(
                     padding: const EdgeInsets.symmetric(
@@ -296,60 +303,84 @@ class _HomePageState extends State<HomePage> {
             ),
 
             // Układ przycisków na dole
-            Padding(
-              padding: EdgeInsets.only(
-                  top: 15 * scaleNotifier.scale,
-                  bottom: 15.0 * scaleNotifier.scale),
-              child: Column(
-                children: [
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
+            Center(
+              child: ConstrainedBox(
+                constraints: const BoxConstraints(
+                    maxWidth: 500), // Maksymalna szerokość na dużych ekranach
+                child: Padding(
+                  padding:
+                      const EdgeInsets.symmetric(vertical: 20, horizontal: 25),
+                  child: Column(
+                    mainAxisSize: MainAxisSize
+                        .min, // Ważne dla poprawnego działania ConstrainedBox
                     children: [
-                      _buildButton(context, "Lista zawodów", () {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                              builder: (context) => const ZawodyScreen()),
-                        );
-                      }),
-                      SizedBox(width: 20 * scaleNotifier.scale),
-                      _buildButton(context, "Dodaj zawody", () {
-                        Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                                builder: (context) =>
-                                    const DodajZawodyScreen()));
-                      }),
+                      // Pierwszy rząd przycisków
+                      Row(
+                        children: [
+                          Expanded(
+                            child: _buildAutoScaleButton(
+                                context, "Lista zawodów", () {
+                              Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                      builder: (context) =>
+                                          const ZawodyScreen()));
+                            }),
+                          ),
+                          const SizedBox(width: 15),
+                          Expanded(
+                            child: _buildAutoScaleButton(
+                                context, "Dodaj zawody", () {
+                              Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                      builder: (context) =>
+                                          const DodajZawodyScreen()));
+                            }),
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: 15),
+                      // Drugi rząd przycisków
+                      Row(
+                        children: [
+                          Expanded(
+                            child:
+                                _buildAutoScaleButton(context, "Partnerzy", () {
+                              Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                      builder: (context) =>
+                                          const PartnerzyScreen()));
+                            }),
+                          ),
+                          const SizedBox(width: 10),
+                          Expanded(
+                            child: _buildAutoScaleButton(context, "Kalkulator",
+                                () {
+                              Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                      builder: (context) =>
+                                          const KalkulatorScreen()));
+                            }),
+                          ),
+                          const SizedBox(width: 10),
+                          Expanded(
+                            flex: 1,
+                            child: _buildAutoScaleButton(context, "📩", () {
+                              Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                      builder: (context) =>
+                                          const OApkScreen()));
+                            }),
+                          ),
+                        ],
+                      ),
                     ],
                   ),
-                  SizedBox(height: 10 * scaleNotifier.scale),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      _buildButton(context, "Partnerzy", () {
-                        Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                                builder: (context) => const PartnerzyScreen()));
-                      }),
-                      SizedBox(width: 13 * scaleNotifier.scale),
-                      _buildButton(context, "Kalkulator", () {
-                        Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                                builder: (context) =>
-                                    const KalkulatorScreen()));
-                      }),
-                      SizedBox(width: 11 * scaleNotifier.scale),
-                      _buildButton(context, "📩", () {
-                        Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                                builder: (context) => const OApkScreen()));
-                      }),
-                    ],
-                  ),
-                ],
+                ),
               ),
             ),
           ],
@@ -358,21 +389,30 @@ class _HomePageState extends State<HomePage> {
     );
   }
 
-  Widget _buildButton(
+// Funkcja do budowania przycisków z auto-skalingiem
+  Widget _buildAutoScaleButton(
       BuildContext context, String text, VoidCallback onPressed) {
-    final scaleNotifier = Provider.of<ScaleNotifier>(context);
+    final screenWidth = MediaQuery.of(context).size.width;
+    // Ustalamy maksymalną szerokość do skalowania - nie więcej niż 700px
+    final scalingWidth = screenWidth > 500 ? 500 : screenWidth;
+
     return ElevatedButton(
+      onPressed: onPressed,
       style: ElevatedButton.styleFrom(
         backgroundColor: Colors.white,
         foregroundColor: Colors.orange,
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-        padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+        padding: const EdgeInsets.symmetric(vertical: 12),
       ),
-      onPressed: onPressed,
-      child: Text(text,
+      child: FittedBox(
+        fit: BoxFit.scaleDown,
+        child: Text(
+          text,
           style: TextStyle(
-            fontSize: 15 * scaleNotifier.scale,
-          )),
+            // Skalujemy tylko do 700px szerokości
+            fontSize: scalingWidth * 0.035,
+          ),
+        ),
+      ),
     );
   }
 
