@@ -1,16 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:url_launcher/url_launcher.dart';
-// import 'package:http/http.dart' as http;
-// import 'dart:convert';
-// import 'config.dart';
+import 'package:http/http.dart' as http;
+import 'dart:convert';
+import 'config.dart';
 import 'package:provider/provider.dart'; // Dodaj import Provider
 import 'scalowanie.dart'; // Importuj ScaleNotifier
-// import 'package:shared_preferences/shared_preferences.dart';
-// import 'package:crypto/crypto.dart';
-import 'package:flutter/foundation.dart';
-import 'package:flutter/services.dart' show rootBundle;
-import 'package:excel/excel.dart';
-import 'dart:typed_data';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'package:crypto/crypto.dart';
 
 class ZawodyScreen extends StatefulWidget {
   const ZawodyScreen({super.key});
@@ -23,12 +19,20 @@ class _ZawodyScreenState extends State<ZawodyScreen> {
   List<Map<String, String>> zawody = [];
   List<String> wojewodztwa = [];
   List<String> miesiace = [];
+  // String? wybraneWojewodztwo;
   List<String> wybraneWojewodztwa = ["Wszystkie województwa"];
   String wybranyMiesiac = "Cały rok";
-  String? wybranyTypZawodow = "Wszystkie";
-  Set<String> wybraneDystanse = {};
-  bool _pokazFiltry = true;
-  // bool _isFetching = false;
+  // String wybranyRok = "2025";
+  String? wybranyTypZawodow = "Wszystkie"; // Dodany filtr na typ zawodów
+  Set<String> wybraneDystanse = {}; // Brak domyślnego dystansu
+
+  bool _pokazFiltry =
+      true; // <-- Nowa zmienna do sterowania widocznością filtrów
+  bool _isFetching = false; // Nowa flaga
+
+  final String apiUrl =
+      "https://api.appsheet.com/api/v2/apps/566e1354-d7f1-49a1-bb85-6ce2f26ce8b4/tables/zawody/records";
+  final String apiKey = Config.apiKey3;
 
   final List<String> dystanseOpcje = [
     "< 5 km",
@@ -37,7 +41,7 @@ class _ZawodyScreenState extends State<ZawodyScreen> {
     "21 km",
     "42 km",
     "Ultra"
-  ];
+  ]; // Opcje dla filtra dystansu
 
   final Map<String, int> miesiaceKolejnosc = {
     "styczeń": 1,
@@ -57,119 +61,222 @@ class _ZawodyScreenState extends State<ZawodyScreen> {
   @override
   void initState() {
     super.initState();
-    _loadLocalExcelData();
+    // _pobierzDaneZAppSheet();
+    _loadLocalData();
   }
 
-  Future<void> _loadLocalExcelData() async {
-    try {
+  /// Ładuje dane z pamięci lokalnej lub pobiera je z AppSheet, jeśli są nieaktualne
+  Future<void> _loadLocalData() async {
+    if (_isFetching) return;
+    _isFetching = true;
+
+    final prefs = await SharedPreferences.getInstance();
+    
+    // Najpierw sprawdź czy mamy zapisane dane lokalnie
+    final localData = prefs.getString('zawodyData');
+    if (localData != null) {
+      final decodedData = json.decode(localData);
       
-      ByteData data = await rootBundle.load('pliki_bazy/zawody.xlsx');
-      Uint8List bytes = data.buffer.asUint8List();
-      var excel = Excel.decodeBytes(bytes);
+      final zawodyData = List<Map<String, dynamic>>.from(decodedData['zawody'])
+          .map((zawod) => zawod.map((key, value) =>
+              MapEntry(key.toString(), value.toString())))
+          .toList();
 
-      List<Map<String, String>> newZawody = [];
-      Set<String> wojewodztwaSet = {"Wszystkie województwa"};
-      Set<String> miesiaceSet = {"Cały rok"};
-
-      for (var table in excel.tables.keys) {
-        var sheet = excel.tables[table];
-        if (sheet == null) continue;
-
-        for (var row in sheet.rows.skip(1)) { // Pomijamy nagłówek
-          String rawDate = row[1]?.value.toString() ?? "";
-          String formattedDate = _formatDate(rawDate);
-          String miesiac = row[2]?.value.toString() ?? "";
-          String rok = row[3]?.value.toString() ?? "";
-          String miejsce = row[5]?.value.toString() ?? "";
-          String wojewodztwo = row[6]?.value.toString() ?? "";
-          String dystanse = row[4]?.value.toString() ?? "";
-          String gorskie = row[7]?.value.toString() ?? "0";
-
-          wojewodztwaSet.add(wojewodztwo);
-          miesiaceSet.add(miesiac);
-
-          newZawody.add({
-            "nazwa": row[0]?.value.toString() ?? "",
-            "dataPrzetworzona": formattedDate,
-            "miesiac": miesiac,
-            "rok": rok,
-            "miejsce": miejsce,
-            "wojewodztwo": wojewodztwo,
-            "dystanse": dystanse,
-            "gorskie": gorskie,
-          });
-        }
-      }
-
-      // Sortowanie miesięcy
-      List<String> sortedMiesiace = miesiaceSet.toList();
-      sortedMiesiace.sort((a, b) => (miesiaceKolejnosc[a] ?? 99)
-          .compareTo(miesiaceKolejnosc[b] ?? 99));
-
-      // Sortowanie województw
-      final List<String> poprawnaKolejnoscWojewodztw = [
-        "DOLNOŚLĄSKIE",
-        "KUJAWSKO-POMORSKIE",
-        "LUBELSKIE",
-        "LUBUSKIE",
-        "ŁÓDZKIE",
-        "MAŁOPOLSKIE",
-        "MAZOWIECKIE",
-        "OPOLSKIE",
-        "PODKARPACKIE",
-        "PODLASKIE",
-        "POMORSKIE",
-        "ŚLĄSKIE",
-        "ŚWIĘTOKRZYSKIE",
-        "WARMIŃSKO-MAZURSKIE",
-        "WIELKOPOLSKIE",
-        "ZACHODNIOPOMORSKIE"
-      ];
-
-      List<String> sortedWojewodztwa = wojewodztwaSet.toList();
-      sortedWojewodztwa.remove("Wszystkie województwa");
-      sortedWojewodztwa.sort((a, b) {
-        final indexA = poprawnaKolejnoscWojewodztw.indexOf(a);
-        final indexB = poprawnaKolejnoscWojewodztw.indexOf(b);
-        if (indexA == -1) return 1;
-        if (indexB == -1) return -1;
-        return indexA.compareTo(indexB);
-      });
-      sortedWojewodztwa.insert(0, "Wszystkie województwa");
+      final wojewodztwaData = List<String>.from(decodedData['wojewodztwa']);
+      final miesiaceData = List<String>.from(decodedData['miesiace']);
 
       setState(() {
-        zawody = newZawody;
-        wojewodztwa = sortedWojewodztwa;
-        miesiace = sortedMiesiace;
+        zawody = zawodyData;
+        wojewodztwa = wojewodztwaData;
+        miesiace = miesiaceData;
       });
-
-      print("✅ Załadowano ${zawody.length} zawodów z pliku Excel");
-    } catch (e) {
-      print("❌ Błąd odczytu pliku Excel: $e");
     }
+    
+    // Zawsze sprawdzamy czy są nowe dane w AppSheet
+    await _pobierzDaneZAppSheet();
+    _isFetching = false;
   }
 
+  Future<void> _saveLocalData() async {
+    final prefs = await SharedPreferences.getInstance();
+
+    // Generuj unikalny identyfikator (timestamp)
+    final timestamp = DateTime.now().toIso8601String();
+
+    // Przygotuj dane do zapisu
+    final dataToSave = {
+      'zawody': zawody,
+      'wojewodztwa': wojewodztwa,
+      'miesiace': miesiace,
+      'timestamp': timestamp, // Dodaj timestamp
+    };
+
+    // Sprawdź, czy dane już istnieją
+    final existingData = prefs.getString('zawodyData');
+    if (existingData != null) {
+      final existingJson = json.decode(existingData);
+      final existingTimestamp = existingJson['timestamp'];
+
+      // Jeśli dane są identyczne, pomiń zapis
+      if (existingTimestamp == timestamp) {
+        print("⏩ Dane są już aktualne, pomijam zapis.");
+        return;
+      }
+    }
+
+    // Zapisz dane
+    prefs.setString('zawodyData', json.encode(dataToSave));
+    prefs.setString(
+        'lastUpdate', timestamp); // Zaktualizuj czas ostatniej aktualizacji
+    print("✅ Zapisano dane lokalnie (timestamp: $timestamp)");
+  }
+
+  /// 📡 Pobiera dane z AppSheet API
+  Future<void> _pobierzDaneZAppSheet() async {
+    try {
+      final url = Uri.parse(apiUrl);
+      // final String? apiKey3 = await Config.getApiKey3();
+      final response = await http.post(
+        url,
+        headers: {
+          "Accept": "application/json",
+          "Content-Type": "application/json; charset=utf-8",
+          "ApplicationAccessKey": apiKey,
+          // "ApplicationAccessKey": apiKey3 ?? "",
+        },
+        body: jsonEncode({
+          "Action": "Find",
+          "Properties": {"Locale": "pl-PL"},
+          "Rows": []
+        }),
+      );
+
+      // print("📩 Odpowiedź status code: ${response.statusCode}");
+      // print("📩 Odpowiedź headers: ${response.headers}");
+      // print("📩 Odpowiedź body: '${response.body}'");
+
+      if (response.statusCode == 200) {
+        if (response.body.trim().isEmpty) {
+          print("⚠ API zwróciło pustą odpowiedź!");
+          return;
+        }
+
+        final decodedBody = utf8.decode(response.bodyBytes);
+        final List<dynamic> data = json.decode(decodedBody);
+
+        // 🔹 Oblicz hash pobranych danych
+      final String newHash = sha256.convert(utf8.encode(json.encode(data))).toString();
+
+      final prefs = await SharedPreferences.getInstance();
+      final String? oldHash = prefs.getString('dataHash');
+
+      if (oldHash != null && oldHash == newHash) {
+        print("⏩ Dane są już aktualne, pomijam zapis.");
+        return;
+      }
+
+      // 🔹 Aktualizujemy hash, bo dane się zmieniły
+      await prefs.setString('dataHash', newHash);
+
+        final wojewodztwaSet = <String>{"Wszystkie województwa"};
+        final miesiaceSet = <String>{"Cały rok"};
+
+        setState(() {
+          zawody = data.map((zawod) {
+            final nazwa = zawod["nazwa"] ?? zawod["Nazwa"] ?? "";
+            final rawDate = zawod["data"] ?? zawod["Data"] ?? "";
+            final miesiac = zawod["miesiac"] ?? zawod["Miesiac"] ?? "";
+            final rok = zawod["rok"] ?? zawod["Rok"] ?? "";
+            final miejsce = zawod["miejsce"] ?? zawod["Miejsce"] ?? "";
+            final wojewodztwo =
+                zawod["wojewodztwo"] ?? zawod["Wojewodztwo"] ?? "";
+            final dystanse = zawod["dystans"] ?? zawod["Dystans"] ?? "";
+            final gorskie = zawod["gorskie"] ?? zawod["Gorskie"] ?? "0";
+
+            wojewodztwaSet.add(wojewodztwo);
+            miesiaceSet.add(miesiac);
+
+            return {
+              "nazwa": nazwa.toString(),
+              "dataPrzetworzona": _formatDate(rawDate),
+              "miesiac": miesiac.toString(),
+              "rok": rok.toString(),
+              "miejsce": miejsce.toString(),
+              "wojewodztwo": wojewodztwo.toString(),
+              "dystanse": dystanse.toString(),
+              "gorskie": gorskie.toString(),
+            };
+          }).toList();
+
+          final List<String> poprawnaKolejnoscWojewodztw = [
+            "DOLNOŚLĄSKIE",
+            "KUJAWSKO-POMORSKIE",
+            "LUBELSKIE",
+            "LUBUSKIE",
+            "ŁÓDZKIE",
+            "MAŁOPOLSKIE",
+            "MAZOWIECKIE",
+            "OPOLSKIE",
+            "PODKARPACKIE",
+            "PODLASKIE",
+            "POMORSKIE",
+            "ŚLĄSKIE",
+            "ŚWIĘTOKRZYSKIE",
+            "WARMIŃSKO-MAZURSKIE",
+            "WIELKOPOLSKIE",
+            "ZACHODNIOPOMORSKIE"
+          ];
+
+          // Sortowanie miesięcy wg poprawnej kolejności
+          miesiace = miesiaceSet.toList();
+          miesiace.sort((a, b) => (miesiaceKolejnosc[a] ?? 99)
+              .compareTo(miesiaceKolejnosc[b] ?? 99));
+
+          // Pobranie listy województw
+          wojewodztwa = wojewodztwaSet.toList();
+
+          // Usunięcie "Wszystkie województwa" przed sortowaniem
+          wojewodztwa.remove("Wszystkie województwa");
+
+          // Sortowanie wg poprawnej kolejności
+          wojewodztwa.sort((a, b) {
+            final indexA = poprawnaKolejnoscWojewodztw.indexOf(a);
+            final indexB = poprawnaKolejnoscWojewodztw.indexOf(b);
+
+            if (indexA == -1)
+              return 1; // Jeśli województwo nie jest w liście, daj na koniec
+            if (indexB == -1) return -1;
+            return indexA.compareTo(indexB);
+          });
+
+          // Dodanie "Wszystkie województwa" na początek listy
+          wojewodztwa.insert(0, "Wszystkie województwa");
+        });
+
+      // ✅ Zapisujemy nową wersję danych w pamięci lokalnej
+      await _saveLocalData();
+      print("✅ Pobrano ${zawody.length} zawodów i zapisano lokalnie!");
+    } else {
+      print("❌ Błąd pobierania danych: ${response.statusCode} - ${response.body}");
+    }
+  } catch (e) {
+    print("❌ Błąd połączenia: $e");
+  }
+}
+
+  /// ✅ Formatuje datę z MM/DD/YYYY na DD-MM-YYYY
   String _formatDate(String rawDate) {
     try {
-      // Najpierw spróbuj parsować jako MM/DD/YYYY
       final dateParts = rawDate.split('/');
       if (dateParts.length == 3) {
         final month = int.parse(dateParts[0]);
         final day = int.parse(dateParts[1]);
         final year = int.parse(dateParts[2]);
-        return "${day.toString().padLeft(2, '0')}-${month.toString().padLeft(2, '0')}-$year";
-      }
-      
-      // Jeśli to nie zadziała, spróbuj parsować jako DateTime (np. jeśli Excel zapisał jako DateTime)
-      DateTime? parsedDate = DateTime.tryParse(rawDate);
-      if (parsedDate != null) {
-        return "${parsedDate.day.toString().padLeft(2, '0')}-${parsedDate.month.toString().padLeft(2, '0')}-${parsedDate.year}";
+        return "${day.toString().padLeft(2, '0')}-${month.toString().padLeft(2, '0')}-${year}";
       }
     } catch (e) {
-      print("❌ Błąd formatowania daty: $rawDate");
+      print("❌ Błąd parsowania daty: $rawDate");
     }
-    
-    // Jeśli nic nie zadziała, zwróć oryginalną wartość
     return rawDate;
   }
 
