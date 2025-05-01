@@ -62,11 +62,11 @@ class _ZawodyScreenState extends State<ZawodyScreen> {
   void initState() {
     super.initState();
     // _pobierzDaneZAppSheet();
-    _loadLocalData();
+    _loadLocalData(context);
   }
 
   /// Ładuje dane z pamięci lokalnej lub pobiera je z AppSheet, jeśli są nieaktualne
-  Future<void> _loadLocalData() async {
+  Future<void> _loadLocalData(BuildContext context) async {
     if (_isFetching) return;
     _isFetching = true;
 
@@ -93,7 +93,7 @@ class _ZawodyScreenState extends State<ZawodyScreen> {
     }
     
     // Zawsze sprawdzamy czy są nowe dane w AppSheet
-    await _pobierzDaneZAppSheet();
+    await _pobierzDaneZAppSheet(context);
     _isFetching = false;
   }
 
@@ -132,7 +132,17 @@ class _ZawodyScreenState extends State<ZawodyScreen> {
   }
 
   /// 📡 Pobiera dane z AppSheet API
-  Future<void> _pobierzDaneZAppSheet() async {
+  Future<void> _pobierzDaneZAppSheet(BuildContext context) async {
+
+    void _showSnackBar(BuildContext context, String message, [Color backgroundColor = Colors.black87]) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(message),
+          duration: const Duration(seconds: 3),
+          backgroundColor: backgroundColor,
+        ),
+      );
+    }
     try {
       final url = Uri.parse(apiUrl);
       // final String? apiKey3 = await Config.getApiKey3();
@@ -172,6 +182,7 @@ class _ZawodyScreenState extends State<ZawodyScreen> {
 
       if (oldHash != null && oldHash == newHash) {
         print("⏩ Dane są już aktualne, pomijam zapis.");
+        _showSnackBar(context, "Liczba zawodów w bazie: ${zawody.length}", Colors.green);
         return;
       }
 
@@ -256,6 +267,7 @@ class _ZawodyScreenState extends State<ZawodyScreen> {
       // ✅ Zapisujemy nową wersję danych w pamięci lokalnej
       await _saveLocalData();
       print("✅ Pobrano ${zawody.length} zawodów i zapisano lokalnie!");
+      _showSnackBar(context, "Zaktualizowano dane – ${zawody.length} zawodów", Colors.green);
     } else {
       print("❌ Błąd pobierania danych: ${response.statusCode} - ${response.body}");
     }
